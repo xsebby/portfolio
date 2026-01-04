@@ -37,7 +37,7 @@ body {
 .subtitle {
     font-size: clamp(1.125rem, 3vw, 1.5rem);
     font-weight: 400;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
     opacity: 0.8;
 }
 
@@ -46,6 +46,11 @@ body {
     height: 50%;
     object-fit: contain;
     display: block;
+}
+
+.social-icon.x-icon {
+    width: 40%;
+    height: 40%;
 }
 
 .social-btn {
