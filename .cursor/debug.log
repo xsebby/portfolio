@@ -1,0 +1,4 @@
+{"location":"main.jsx:3","message":"Before CSS import","data":{"timestamp":1767659458638},"timestamp":1767659458638,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"main.jsx:6","message":"After CSS import","data":{"timestamp":1767659458638},"timestamp":1767659458638,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"main.jsx:9","message":"Before render","data":{"rootExists":true},"timestamp":1767659458638,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"main.jsx:16","message":"After render","data":{"timestamp":1767659458638},"timestamp":1767659458638,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}

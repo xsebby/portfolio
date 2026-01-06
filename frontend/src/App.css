@@ -1,1 +1,17 @@
 /* App-specific styles */
+#root {
+    width: 100%;
+}
+
+body {
+    display: block;
+}
+
+@media (max-width: 640px) {
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+}
