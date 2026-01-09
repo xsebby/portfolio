@@ -1,0 +1,93 @@
+.contact-page {
+    min-height: 100vh;
+    padding: 6rem 0 4rem;
+}
+
+.contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.page-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #ffffff;
+}
+
+.page-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 400;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 4rem;
+}
+
+.contact-content {
+    margin-top: 3rem;
+}
+
+.section-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+}
+
+.contact-text {
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 3rem;
+}
+
+.contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-method {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.contact-method:hover {
+    background: #3a3a3a;
+    border-color: #4a4a4a;
+    transform: translateY(-3px);
+}
+
+.method-label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.method-value {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #ffffff;
+}
+
+@media (max-width: 640px) {
+    .contact-page {
+        padding: 5rem 0 3rem;
+    }
+    
+    .contact-method {
+        padding: 1.25rem;
+    }
+}

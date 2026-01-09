@@ -5,46 +5,56 @@ function Skills() {
         {
             name: 'React',
             icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-            learning: true
+            learning: true,
+            link: 'https://react.dev/'
         },
         {
             name: 'Node.js',
             icon: 'https://nodejs.org/static/images/logo.svg',
-            learning: true
+            learning: true,
+            link: 'https://nodejs.org/'
         },
         {
             name: 'Python',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
+            link: 'https://www.python.org/'
         },
         {
             name: 'JavaScript',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-plain.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-plain.svg',
+            link: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript'
         },
         {
             name: 'HTML',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-plain.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-plain.svg',
+            link: 'https://www.w3.org/html/'
         },
         {
             name: 'CSS',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-plain.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-plain.svg',
+            link: 'https://www.w3.org/Style/CSS/Overview.en.html'
         },
         {   
             name: 'Java',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-plain.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-plain.svg',
+            link: 'https://www.java.com/'
         },
         {
             name: 'C++',
             icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-plain.svg',
-            learning: true
+            learning: true,
+            link: 'https://www.cplusplus.com/'
         },
         {
             name: 'C',
             icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg',
-            learning: true
+            learning: true,
+            link: 'https://www.cprogramming.com/'
         },
         {
             name: 'Figma',
-            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg'
+            icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg',
+            link: 'https://www.figma.com/'
         }
     ];
     return (
@@ -53,7 +63,8 @@ function Skills() {
             <h2 className="skills-title">Skills</h2>
             <div className="skills-grid">
               {skills.map((skill) => (
-                <div key={skill.name} className="skill-card">
+                <a href={skill.link} target="_blank" rel="noopener noreferrer">
+                  <div key={skill.name} className="skill-card">
                   <div className="skill-icon-wrapper">
                     <img 
                       src={skill.icon} 
@@ -79,6 +90,7 @@ function Skills() {
                   </div>
                   <p className="skill-name">{skill.name}</p>
                 </div>
+                </a>
               ))}
             </div>
           </div>
