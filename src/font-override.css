@@ -1,0 +1,15 @@
+/* Zinc + emerald palette, IBM Plex Mono for labels */
+:root {
+  --font-sans: "Fraunces", serif !important;
+  --font-heading: "Fraunces", serif !important;
+  --font-mono: "IBM Plex Mono", monospace !important;
+  --color-bg: #09090b;
+  --color-bg-soft: #18181b;
+  --color-text: #fafafa;
+  --color-muted: #71717a;
+  --color-accent: #34d399;
+}
+
+body, h1, h2, h3, p, span, a {
+  font-family: "Fraunces", serif !important;
+}
