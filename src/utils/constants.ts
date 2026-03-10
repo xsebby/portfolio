@@ -33,7 +33,7 @@ export const ABOUT =
 export const SOCIALS: readonly Social[] = [
   { label: "GitHub", href: "https://github.com/xsebby" },
   { label: "X", href: "https://x.com/xsebby" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/xsebby" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/sebastian-raducha/" },
 ];
 
 export const WORK_ITEMS: readonly WorkItem[] = [
