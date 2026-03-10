@@ -39,7 +39,7 @@ const ItemRow = memo(function ItemRow({
       initial={ITEM_ANIMATION.initial}
       animate={ITEM_ANIMATION.animate(delay)}
     >
-      <div className="flex items-baseline justify-between gap-2 sm:gap-8 w-full">
+      <div className="flex items-baseline flex-wrap gap-x-4 gap-y-0.5">
         <div className="flex items-baseline gap-2 min-w-0">
           <span className="font-semibold text-zinc-100 truncate group-hover:text-emerald-50/90 transition-colors">
             {label}
