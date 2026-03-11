@@ -1,10 +1,16 @@
 import { GITHUB_USERNAME } from "@/utils/constants";
+import * as emoji from "node-emoji";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 const AVATAR_URL = `https://avatars.githubusercontent.com/${GITHUB_USERNAME}?size=160`;
 
 type ApiResponse = { status?: { emoji: string; message: string } };
+
+function toShortcode(emojiChar: string): string {
+  const code = emoji.which(emojiChar);
+  return code ?? emojiChar;
+}
 
 export function GitHubProfile() {
   const [status, setStatus] = useState<{ emoji: string; message: string } | null>(null);
@@ -19,7 +25,7 @@ export function GitHubProfile() {
 
   return (
     <motion.div
-      className="shrink-0"
+      className="shrink-0 flex flex-col items-center"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, delay: 0.2 }}
@@ -30,20 +36,21 @@ export function GitHubProfile() {
           alt=""
           width={112}
           height={112}
-          className="size-24 md:size-22 rounded-full ring-2 ring-zinc-700"
+          className="size-24 md:size-28 rounded-full ring-2 ring-zinc-700"
         />
-        {status && (
-          <span
-            className="absolute -bottom-1 -right-1 flex items-center gap-1 rounded-full bg-zinc-800 px-2 py-0.5 text-xs font-mono text-zinc-300 ring-2 ring-zinc-900"
-            title={status.message}
-          >
-            {status.emoji && (
-              <span className="text-sm leading-none">{status.emoji}</span>
-            )}
-            <span className="max-w-24 truncate">{status.message}</span>
-          </span>
-        )}
       </div>
+      {status && (
+        <span
+          className="mt-2 rounded-md bg-zinc-800/80 px-2.5 py-1 text-xs font-mono text-zinc-300"
+          title={status.message}
+        >
+          {status.emoji ? (
+            <span className="text-zinc-500">{toShortcode(status.emoji)}</span>
+          ) : null}
+          {status.emoji && status.message ? " " : null}
+          <span className="text-zinc-200">{status.message}</span>
+        </span>
+      )}
     </motion.div>
   );
 }

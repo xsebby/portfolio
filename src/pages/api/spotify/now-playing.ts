@@ -48,8 +48,36 @@ export default async function handler(
     );
 
     if (playerRes.status === 204 || !playerRes.ok) {
-      // 204 = nothing playing
-      return res.status(200).json({ playing: false });
+      // 204 = nothing playing — try recently played as fallback
+      const recentRes = await fetch(
+        "https://api.spotify.com/v1/me/player/recently-played?limit=1",
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      if (!recentRes.ok) {
+        return res.status(200).json({ playing: false });
+      }
+      const recentData = (await recentRes.json()) as {
+        items?: Array<{
+          track?: {
+            name: string;
+            artists: Array<{ name: string }>;
+            album?: { images?: Array<{ url: string; height: number }> };
+          };
+        }>;
+      };
+      const recentItem = recentData.items?.[0]?.track;
+      if (!recentItem) {
+        return res.status(200).json({ playing: false });
+      }
+      const image = recentItem.album?.images?.sort(
+        (a, b) => (b.height ?? 0) - (a.height ?? 0)
+      )[0];
+      return res.status(200).json({
+        playing: false,
+        song: recentItem.name,
+        artist: recentItem.artists?.map((a) => a.name).join(", ") ?? "",
+        albumArtUrl: image?.url ?? "",
+      });
     }
 
     const data = (await playerRes.json()) as {

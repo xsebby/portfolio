@@ -76,8 +76,8 @@ export default function Callback() {
               {refreshToken}
             </pre>
             <p className="text-xs text-zinc-500">
-              Also add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET from your
-              Spotify Developer app.
+              Also add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET. Use scopes:{" "}
+              <code className="text-zinc-400">user-read-currently-playing user-read-playback-state user-read-recently-played</code>
             </p>
           </div>
         )}
