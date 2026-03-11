@@ -9,7 +9,7 @@ const ITEM_ANIMATION = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9], delay },
+    transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] as const, delay },
   }),
 } as const;
 

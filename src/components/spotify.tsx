@@ -1,13 +1,6 @@
 import { Marquee } from "@/components/marquee";
-import { DISCORD_SNOWFLAKE } from "@/utils/constants";
-import { getSpotifyStatus } from "@/utils/spotify";
-import {
-  AnimatePresence,
-  motion,
-  MotionNodeAnimationOptions,
-} from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { Types, useLanyardWS } from "use-lanyard";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
 
 const EQUALIZER_DELAYS = [0, 0.15, 0.3];
 
@@ -25,7 +18,7 @@ const EQUALIZER_ANIMATION = {
       ease: "easeInOut",
     },
   },
-} as const satisfies MotionNodeAnimationOptions;
+} as const;
 
 const SONG_CHANGE = {
   initial: {
@@ -41,7 +34,7 @@ const SONG_CHANGE = {
   transition: {
     duration: 0.3,
   },
-} as const satisfies MotionNodeAnimationOptions;
+} as const;
 
 const GLOW_FADE = {
   initial: {
@@ -55,7 +48,7 @@ const GLOW_FADE = {
   transition: {
     duration: 0.5,
   },
-} as const satisfies MotionNodeAnimationOptions;
+} as const;
 
 const SPOTIFY_PILL_ANIMATION = {
   animate: {
@@ -73,7 +66,7 @@ const SPOTIFY_PILL_ANIMATION = {
     stiffness: 60,
     delay: 0.8,
   },
-} as const satisfies MotionNodeAnimationOptions;
+} as const;
 
 interface SpotifyState {
   song: string;
@@ -83,61 +76,38 @@ interface SpotifyState {
 }
 
 export function Spotify() {
-  const data = useLanyardWS(DISCORD_SNOWFLAKE);
   const [spotify, setSpotify] = useState<SpotifyState | null>(null);
-  const staleWSData = useRef<Types.Spotify | null>(null);
 
-  const currentSong = data?.spotify?.song;
-  const isConnected = data !== undefined;
+  const fetchNowPlaying = useCallback(async () => {
+    try {
+      const res = await fetch("/api/spotify/now-playing");
+      const data = (await res.json()) as {
+        playing?: boolean;
+        song?: string;
+        artist?: string;
+        albumArtUrl?: string;
+      };
+
+      if (data.song && data.artist !== undefined) {
+        setSpotify({
+          song: data.song,
+          artist: data.artist,
+          albumArtUrl: data.albumArtUrl ?? "",
+          isPlaying: data.playing ?? false,
+        });
+      } else {
+        setSpotify(null);
+      }
+    } catch {
+      setSpotify(null);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!isConnected) {
-      // if we dont have data, chances are we havent even connected to the socket yet
-      return;
-    }
-
-    if (data?.spotify) {
-      setSpotify({
-        song: data.spotify.song,
-        artist: data.spotify.artist ?? "",
-        albumArtUrl: data.spotify.album_art_url ?? "",
-        isPlaying: true,
-      });
-
-      staleWSData.current = data.spotify;
-      return;
-    }
-
-    // if lanyard reports no spotify data, but we have a stale value of it, lets use that instead
-    // of making a new API request
-    if (spotify && staleWSData.current !== null) {
-      setSpotify({
-        ...spotify,
-        isPlaying: false,
-      });
-
-      return;
-    }
-
-    // last resort, fall back to my last.fm data to show (maybe) stale data.
-    // why do i say "stale"? mainly because i must finish a song for it to be considered a "scrobble"
-    // otherwise it would omit it from the list.
-    getSpotifyStatus().then((res) => {
-      if (!res || !res.lastTrack) return;
-
-      const albumArt =
-        res.lastTrack.image.find((img) => img.size === "extralarge")?.[
-          "#text"
-        ] ?? "";
-
-      setSpotify({
-        song: res.lastTrack.name,
-        artist: res.lastTrack.artist.name,
-        albumArtUrl: albumArt,
-        isPlaying: false,
-      });
-    });
-  }, [currentSong, isConnected]);
+    fetchNowPlaying();
+    const interval = setInterval(fetchNowPlaying, 30_000);
+    return () => clearInterval(interval);
+  }, [fetchNowPlaying]);
 
   return (
     <AnimatePresence>
@@ -200,7 +170,7 @@ export function Spotify() {
                         </motion.div>
 
                         <img
-                          className="absolute size-18 left-0 top-0 z-0 blur-3xl"
+                          className="absolute size-6 left-0 top-0 z-0 blur-3xl"
                           src={spotify.albumArtUrl}
                           alt={`${spotify.song} by ${spotify.artist}`}
                         />
