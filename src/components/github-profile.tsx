@@ -7,9 +7,12 @@ const AVATAR_URL = `https://avatars.githubusercontent.com/${GITHUB_USERNAME}?siz
 
 type ApiResponse = { status?: { emoji: string; message: string } };
 
-function toShortcode(emojiChar: string): string {
-  const code = emoji.which(emojiChar);
-  return code ?? emojiChar;
+function toEmoji(nameOrChar: string): string {
+  if (!nameOrChar) return "";
+  // GitHub returns shortcode (e.g. "writing_hand"); convert to actual emoji
+  const withColons = nameOrChar.includes(":") ? nameOrChar : `:${nameOrChar}:`;
+  const char = emoji.get(withColons);
+  return char ?? nameOrChar;
 }
 
 export function GitHubProfile() {
@@ -45,9 +48,8 @@ export function GitHubProfile() {
           title={status.message}
         >
           {status.emoji ? (
-            <span className="text-zinc-500">{toShortcode(status.emoji)}</span>
+            <span role="img" aria-hidden className="mr-1">{toEmoji(status.emoji)}</span>
           ) : null}
-          {status.emoji && status.message ? " " : null}
           <span className="text-zinc-200">{status.message}</span>
         </span>
       )}

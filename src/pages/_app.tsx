@@ -96,7 +96,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
               className="relative flex flex-col items-start w-full md:w-auto max-w-2xl md:max-w-none pl-0 border-l-0 md:pl-8 md:border-l md:border-zinc-800"
             >
               <Spotify />
-              <div className="flex items-center gap-4 md:gap-5">
+              <div className="flex items-center gap-4 md:gap-5 pt-6">
                 <GitHubProfile />
                 <AnimatedText
                   text="sebby"
@@ -129,21 +129,30 @@ export default function App({ Component, pageProps, router }: AppProps) {
                 ))}
               </div>
 
-              <section className="mt-8">
+              <motion.section
+                className="mt-8"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.6,
+                  ease: [0.2, 0.65, 0.3, 0.9],
+                  delay: 0.5,
+                }}
+              >
                 <AnimatedText
                   text="about"
                   element="h2"
                   className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2"
-                  artificialDelay={0.3}
+                  artificialDelay={0.5}
                 />
                 <AnimatedText
                   text={ABOUT}
                   element="p"
                   className="text-zinc-400 text-sm max-w-xl leading-relaxed"
-                  artificialDelay={0.3}
+                  artificialDelay={0.55}
                   fast
                 />
-              </section>
+              </motion.section>
 
               <Component {...pageProps} />
 

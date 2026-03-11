@@ -36,20 +36,6 @@ const SONG_CHANGE = {
   },
 } as const;
 
-const GLOW_FADE = {
-  initial: {
-    opacity: 0,
-    scale: 0.9,
-  },
-  animate: {
-    opacity: 1,
-    scale: 1,
-  },
-  transition: {
-    duration: 0.5,
-  },
-} as const;
-
 const SPOTIFY_PILL_ANIMATION = {
   animate: {
     opacity: 1,
@@ -80,7 +66,7 @@ export function Spotify() {
 
   const fetchNowPlaying = useCallback(async () => {
     try {
-      const res = await fetch("/api/spotify/now-playing");
+      const res = await fetch("/api/lastfm/now-playing");
       const data = (await res.json()) as {
         playing?: boolean;
         song?: string;
@@ -124,83 +110,51 @@ export function Spotify() {
             style={{
               borderRadius: 9999,
             }}
-            className="absolute -top-10 p-0.5 overflow-hidden bg-zinc-800 min-w-48 max-w-[calc(100vw-3rem)] sm:max-w-md rounded-[9999px]"
+            className="absolute -top-6 left-0 p-0.5 overflow-hidden bg-zinc-800/80 min-w-40 max-w-52 rounded-full"
           >
-            <AnimatePresence mode="popLayout">
-              {spotify.albumArtUrl ? (
-                <motion.img
-                  key={spotify.albumArtUrl}
-                  initial={GLOW_FADE.initial}
-                  animate={GLOW_FADE.animate}
-                  exit={GLOW_FADE.initial}
-                  transition={GLOW_FADE.transition}
-                  className="absolute inset-0 h-full w-full object-cover scale-150 blur-3xl saturate-200 will-change-[transform,opacity]"
-                  src={spotify.albumArtUrl}
-                  alt=""
-                />
-              ) : null}
-            </AnimatePresence>
-            <div className="absolute inset-0 bg-linear-to-r from-transparent via-zinc-800/50 to-zinc-800" />
-
             <motion.div
               layout
               style={{
                 borderRadius: 9999,
               }}
-              className="relative flex gap-2 items-center bg-zinc-900 overflow-hidden rounded-[9999px]"
+              className="relative flex gap-2 items-center px-2 py-1 bg-zinc-900 overflow-hidden rounded-[9999px]"
             >
               <AnimatePresence mode="popLayout">
                 <motion.div
                   key={spotify.song}
-                  className="flex items-center min-w-0 pl-2 py-2 will-change-[transform,opacity,filter]"
+                  className="flex items-center min-w-0 gap-5 py-1 will-change-[transform,opacity,filter]"
                   animate={SONG_CHANGE.animate}
                   initial={SONG_CHANGE.initial}
                   exit={SONG_CHANGE.initial}
                   transition={SONG_CHANGE.transition}
                 >
-                  <div className="shrink-0">
-                    {spotify.albumArtUrl ? (
-                      <>
-                        <motion.div layout className="relative z-10">
-                          <img
-                            className="size-6 rounded-lg"
-                            src={spotify.albumArtUrl}
-                            alt={`${spotify.song} by ${spotify.artist}`}
-                          />
-                        </motion.div>
-
-                        <img
-                          className="absolute size-6 left-0 top-0 z-0 blur-3xl"
-                          src={spotify.albumArtUrl}
-                          alt={`${spotify.song} by ${spotify.artist}`}
-                        />
-                      </>
-                    ) : null}
-                  </div>
+                  {spotify.albumArtUrl ? (
+                    <img
+                      className="size-5 rounded shrink-0 object-cover gap-10 ml-[3px]"
+                      src={spotify.albumArtUrl}
+                      alt=""
+                    />
+                  ) : null}
                   <Marquee className="min-w-0">
-                    <motion.span layout className="text-zinc-100 text-sm pl-2">
-                      {spotify.song}
-                    </motion.span>
-                    <motion.span
-                      layout
-                      className="text-zinc-400 text-sm pl-2 whitespace-nowrap"
-                    >
+                    <span className="text-zinc-100 text-xs">{spotify.song}</span>
+                    <span className="text-zinc-500 text-xs mx-1">·</span>
+                    <span className="text-zinc-400 text-xs whitespace-nowrap">
                       {spotify.artist}
-                    </motion.span>
+                    </span>
                   </Marquee>
                 </motion.div>
               </AnimatePresence>
 
-              <div className="relative flex items-center gap-0.5 h-[stretch] ml-auto pr-2 bg-zinc-900">
-                <div className="absolute right-full h-full w-3 bg-linear-to-r from-transparent to-zinc-900 pointer-events-none" />
+              <div className="relative flex items-center gap-0.5 h-[stretch] ml-0 mr-0 pl-2 pr-2 pt-0.5 bg-zinc-900">
+                <div className="absolute right-full h-full w-2 bg-linear-to-r from-transparent to-zinc-900 pointer-events-none" />
                 {EQUALIZER_DELAYS.map((delay, i) => (
                   <motion.div
                     layout
                     key={i}
                     className={
                       (spotify.isPlaying
-                        ? "bg-emerald-500 h-2.5"
-                        : "bg-zinc-500 h-1") +
+                        ? "bg-emerald-500 h-2"
+                        : "bg-zinc-500 h-0.5") +
                       " w-0.5 rounded-full origin-center will-change-transform"
                     }
                     animate={

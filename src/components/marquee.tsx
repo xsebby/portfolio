@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 
 const MASK_GRADIENT =
-  "linear-gradient(to right, transparent, black 8%, black 92%, transparent)";
+  "linear-gradient(to right, transparent, black 4%, black 92%, transparent)";
 
 export function Marquee({
   children,
