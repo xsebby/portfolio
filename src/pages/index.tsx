@@ -33,14 +33,11 @@ const ItemRow = memo(function ItemRow({
   delay,
 }: ItemRowProps) {
   const rowClassName =
-    "relative flex flex-col items-start pl-4 py-3 text-left rounded-r-md border-l-2 border-transparent transition-all" +
-    (clickable
-      ? " group hover:border-emerald-500/40 hover:bg-zinc-900/50"
-      : " cursor-default");
+    "group relative flex flex-col items-start pl-4 py-3 text-left rounded-r-md border-l-2 border-transparent hover:border-emerald-500/40 hover:bg-zinc-900/50 transition-all " +
+    (clickable ? "cursor-pointer" : "cursor-default");
 
   const titleClassName =
-    "font-semibold text-zinc-100 truncate transition-colors" +
-    (clickable ? " group-hover:text-emerald-50/90" : "");
+    "font-semibold text-zinc-100 truncate group-hover:text-emerald-50/90 transition-colors";
 
   const inner = (
     <>
