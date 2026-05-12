@@ -173,9 +173,15 @@ export default function App({ Component, pageProps, router }: AppProps) {
                 <h2>work</h2>
                 {WORK_ITEMS.map((item) => (
                   <div key={item.slug}>
-                    <a href={item.url}>
-                      <strong>{item.company}</strong> — {item.role}
-                    </a>
+                    {item.clickable === false ? (
+                      <p>
+                        <strong>{item.company}</strong> — {item.role}
+                      </p>
+                    ) : (
+                      <a href={item.url}>
+                        <strong>{item.company}</strong> — {item.role}
+                      </a>
+                    )}
                     <p>{item.about}</p>
                     <span>{item.date}</span>
                   </div>
@@ -184,9 +190,15 @@ export default function App({ Component, pageProps, router }: AppProps) {
                 <h2>projects</h2>
                 {PROJECTS.map((project) => (
                   <div key={project.slug}>
-                    <a href={project.url}>
-                      <strong>{project.name}</strong> — {project.role}
-                    </a>
+                    {project.clickable === false ? (
+                      <p>
+                        <strong>{project.name}</strong> — {project.role}
+                      </p>
+                    ) : (
+                      <a href={project.url}>
+                        <strong>{project.name}</strong> — {project.role}
+                      </a>
+                    )}
                     <p>{project.about}</p>
                   </div>
                 ))}

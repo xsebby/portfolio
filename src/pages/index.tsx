@@ -19,6 +19,7 @@ type ItemRowProps = {
   about: string;
   date?: string;
   url: string;
+  clickable?: boolean;
   delay: number;
 };
 
@@ -28,22 +29,24 @@ const ItemRow = memo(function ItemRow({
   about,
   date,
   url,
+  clickable = true,
   delay,
 }: ItemRowProps) {
-  return (
-    <motion.a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex flex-col items-start pl-4 py-3 text-left rounded-r-md border-l-2 border-transparent hover:border-emerald-500/40 hover:bg-zinc-900/50 transition-all"
-      initial={ITEM_ANIMATION.initial}
-      animate={ITEM_ANIMATION.animate(delay)}
-    >
+  const rowClassName =
+    "relative flex flex-col items-start pl-4 py-3 text-left rounded-r-md border-l-2 border-transparent transition-all" +
+    (clickable
+      ? " group hover:border-emerald-500/40 hover:bg-zinc-900/50"
+      : " cursor-default");
+
+  const titleClassName =
+    "font-semibold text-zinc-100 truncate transition-colors" +
+    (clickable ? " group-hover:text-emerald-50/90" : "");
+
+  const inner = (
+    <>
       <div className="flex items-baseline flex-wrap gap-x-4 gap-y-0.5">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="font-semibold text-zinc-100 truncate group-hover:text-emerald-50/90 transition-colors">
-            {label}
-          </span>
+          <span className={titleClassName}>{label}</span>
           <span className="text-sm text-zinc-500 font-mono hidden sm:inline">
             {role}
           </span>
@@ -62,7 +65,32 @@ const ItemRow = memo(function ItemRow({
       <span className="relative text-sm text-zinc-400 leading-snug mt-0.5">
         {about}
       </span>
-    </motion.a>
+    </>
+  );
+
+  if (clickable) {
+    return (
+      <motion.a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={rowClassName}
+        initial={ITEM_ANIMATION.initial}
+        animate={ITEM_ANIMATION.animate(delay)}
+      >
+        {inner}
+      </motion.a>
+    );
+  }
+
+  return (
+    <motion.div
+      className={rowClassName}
+      initial={ITEM_ANIMATION.initial}
+      animate={ITEM_ANIMATION.animate(delay)}
+    >
+      {inner}
+    </motion.div>
   );
 });
 
@@ -85,6 +113,7 @@ export default function Home() {
             about={item.about}
             date={item.date}
             url={item.url}
+            clickable={item.clickable}
             delay={0.5 + i * 0.1}
           />
         ))}
@@ -106,6 +135,7 @@ export default function Home() {
             about={project.about}
             date={project.date}
             url={project.url}
+            clickable={project.clickable}
             delay={0.6 + i * 0.1}
           />
         ))}

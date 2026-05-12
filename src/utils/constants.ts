@@ -5,6 +5,8 @@ export type WorkItem = {
   date: string;
   about: string;
   url: string;
+  /** When false, the row is shown but does not link out (defaults to true). */
+  clickable?: boolean;
   image?: string;
 };
 
@@ -15,6 +17,8 @@ export type Project = {
   date: string;
   about: string;
   url: string;
+  /** When false, the row is shown but does not link out (defaults to true). */
+  clickable?: boolean;
   image?: string;
 };
 
@@ -28,7 +32,7 @@ export type Social = {
 
 // Edit your bio here
 export const ABOUT =
-  "student at rutgers university studying comp sci, finance, and math. interested in software engineering, ai/ml, and fintech.";
+  "student at rutgers university studying comp sci and math. interested in software engineering, ai/ml, and fintech.";
 
 export const SOCIALS: readonly Social[] = [
   { label: "GitHub", href: "https://github.com/xsebby" },
@@ -44,6 +48,7 @@ export const WORK_ITEMS: readonly WorkItem[] = [
     date: "2025 - present",
     about: "focused on revamping website for Rutgers University Mobile App Development Club.",
     url: "https://rumad.club",
+    clickable: false,
   },
 ];
 
@@ -55,13 +60,14 @@ export const PROJECTS: readonly Project[] = [
     date: "January 2026 - present",
     about: "stock portfolio tracker (WIP)",
     url: "https://github.com/xsebby/portfolio",
+    clickable: false,
   },
   {
     name: "RUBus-Notify",
     slug: "rubus-notify",
     role: "creator",
     date: "March 2025 - present",
-    about: "iOS transit app for Rutgers buses that shows arrival times and notifies when your bus is coming.",
-    url: "https://github.com/xsebby/RUBus-Notify",
+    about: "iOS transit app for Rutgers buses that shows arrival times and notifies when your bus is coming. (WIP)",
+    url: "https://streamable.com/0xfg66",
   },
 ];
