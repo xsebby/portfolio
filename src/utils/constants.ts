@@ -32,7 +32,7 @@ export type Social = {
 
 // Edit your bio here
 export const ABOUT =
-  "student at rutgers university studying comp sci and math. interested in software engineering, ai/ml, and fintech.";
+  "student at rutgers university studying comp sci and math. currently shipping a transit app for rutgers, and layering ML onto a financial dashboard..";
 
 export const SOCIALS: readonly Social[] = [
   { label: "GitHub", href: "https://github.com/xsebby" },
@@ -54,8 +54,17 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 
 export const PROJECTS: readonly Project[] = [
   {
-    name: "portfolio",
-    slug: "portfolio",
+    name: "CSP revamped - HACKRU 2025",
+    slug: "csp-revamped-hackru-2025",
+    role: "developer",
+    date: "October 2025",
+    about: "a revamped version of the course schedule planner at rutgers, built frontend with javascript and figma, co-developed a machine learning model with python.",
+    url: "https://github.com/SevenNebula9910/RateMyProfessor_chrome-extension",
+    clickable: true,
+  },
+  {
+    name: "pulse",
+    slug: "pulse",
     role: "creator",
     date: "January 2026 - present",
     about: "stock portfolio tracker (WIP)",
