@@ -32,7 +32,7 @@ export type Social = {
 
 // Edit your bio here
 export const ABOUT =
-  "student at rutgers university studying comp sci and math. currently shipping a transit app for rutgers, and layering ML onto a financial dashboard..";
+  "student at rutgers university studying comp sci and math. currently shipping a personal finance and budgeting app and taking the time to learn machine learning.";
 
 export const SOCIALS: readonly Social[] = [
   { label: "GitHub", href: "https://github.com/xsebby" },
@@ -45,9 +45,18 @@ export const WORK_ITEMS: readonly WorkItem[] = [
     company: "RUMAD Web Team",
     slug: "rumad",
     role: "web developer",
-    date: "2025 - present",
+    date: "october 2025 - may 2026",
     about: "focused on revamping website for Rutgers University Mobile App Development Club.",
     url: "https://rumad.club",
+    clickable: false,
+  },
+  {
+    company: "R.C. Auto Group",
+    slug: "ray-catena",
+    role: "web development intern",
+    date: "june 2026 - present",
+    about: "working on SEO and web development for luxury car dealerships.",
+    url: "https://raycatena.com",
     clickable: false,
   },
 ];
@@ -57,7 +66,7 @@ export const PROJECTS: readonly Project[] = [
     name: "CSP revamped - HACKRU 2025",
     slug: "csp-revamped-hackru-2025",
     role: "developer",
-    date: "October 2025",
+    date: "october 2025",
     about: "a revamped version of the course schedule planner at rutgers, built frontend with javascript and figma, co-developed a machine learning model with python.",
     url: "https://github.com/SevenNebula9910/RateMyProfessor_chrome-extension",
     clickable: true,
@@ -66,16 +75,16 @@ export const PROJECTS: readonly Project[] = [
     name: "pulse",
     slug: "pulse",
     role: "creator",
-    date: "January 2026 - present",
-    about: "stock portfolio tracker (WIP)",
-    url: "https://github.com/xsebby/portfolio",
+    date: "april 2026 - present",
+    about: "a personal finance and budgeting app (WIP)",
+    url: "https://github.com/xsebby/stock-portfolio-tracker",
     clickable: false,
   },
   {
     name: "RUBus-Notify",
     slug: "rubus-notify",
     role: "creator",
-    date: "March 2025 - present",
+    date: "march 2026 - present",
     about: "iOS transit app for Rutgers buses that shows arrival times and notifies when your bus is coming. (WIP)",
     url: "https://streamable.com/0xfg66",
   },
