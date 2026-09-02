@@ -76,8 +76,8 @@ export const VFX_PROJECTS: readonly VfxProject[] = [
     date: "2026",
     about: "animated a tezzus 3d model in blender for 'The New Generation Tour'.",
     details: "model made by @ge6.ae , took about 2-3 hours to animate.",
-    image: "https://cdn.discordapp.com/attachments/478626050457206784/1544572877733502996/image.png?ex=6a98ff16&is=6a97ad96&hm=e2522a4731766475da1d256fe9954f58e55469f5ebeb337a1a981a4e8394944f&",  // optional direct image URL
-    link: "https://www.instagram.com/p/DcuQiYMjOx", // auto-pulls thumbnail if image is omitted
+    // image: "https://cdn.discordapp.com/attachments/478626050457206784/1544572877733502996/image.png?ex=6a98ff16&is=6a97ad96&hm=e2522a4731766475da1d256fe9954f58e55469f5ebeb337a1a981a4e8394944f&",  // optional direct image URL
+    link: "https://www.instagram.com/p/DcuQiYMjOx3/", // auto-pulls thumbnail if image is omitted
     linkLabel: "view post",
   },
 ];
