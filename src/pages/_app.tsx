@@ -1,25 +1,23 @@
 import AnimatedText from "@/components/animated-text";
-import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons";
+import { GitHubIcon, InstagramIcon, LinkedInIcon, XIcon } from "@/components/icons";
 import { GitHubProfile } from "@/components/github-profile";
 import { Spotify } from "@/components/spotify";
-import { ABOUT, PROJECTS, SOCIALS, WORK_ITEMS } from "@/utils/constants";
+import { WorkDetailPanel } from "@/components/work-detail-panel";
+import { ViewToggle } from "@/components/view-toggle";
+import { DetailPanelProvider } from "@/context/detail-panel-context";
+import { ViewProvider, useView } from "@/context/view-context";
+import {
+  ABOUT,
+  PROJECTS,
+  SOCIALS,
+  VFX_ABOUT,
+  VFX_SOCIALS,
+  WORK_ITEMS,
+} from "@/utils/constants";
 import "@/globals.css";
 import "@/font-override.css";
 import { Analytics } from "@vercel/analytics/next";
 import { LayoutGroup, motion } from "motion/react";
-
-const SOCIAL_ANIMATION = {
-  initial: { opacity: 0, y: 5 },
-  animate: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.2, 0.65, 0.3, 0.9] as const,
-      delay: 0.35 + i * 0.05,
-    },
-  }),
-} as const;
 import type { AppProps } from "next/app";
 import Head from "next/head";
 
@@ -44,7 +42,183 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   GitHub: <GitHubIcon />,
   X: <XIcon />,
   LinkedIn: <LinkedInIcon />,
+  Instagram: <InstagramIcon />,
 };
+
+const SOCIAL_ANIMATION = {
+  initial: { opacity: 0, y: 5 },
+  animate: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.2, 0.65, 0.3, 0.9] as const,
+      delay: 0.35 + i * 0.05,
+    },
+  }),
+} as const;
+
+const VIEW_BACKGROUNDS = {
+  dev: {
+    base: "#09090b",
+    glow: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(52, 211, 153, 0.08), transparent)",
+    border: "rgb(39 39 42)",
+  },
+  vfx: {
+    base: "#0a0812",
+    glow: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.14), transparent), radial-gradient(ellipse 60% 40% at 80% 100%, rgba(167, 139, 250, 0.06), transparent)",
+    border: "rgb(63 47 98)",
+  },
+} as const;
+
+function PortfolioShell({ Component, pageProps }: AppProps) {
+  const { view } = useView();
+  const socials = view === "dev" ? SOCIALS : VFX_SOCIALS;
+  const subtitle = view === "dev" ? "developer" : "vfx artist";
+  const about = view === "dev" ? ABOUT : VFX_ABOUT;
+  const bg = VIEW_BACKGROUNDS[view];
+
+  return (
+    <motion.div
+      className="relative flex flex-1 min-h-screen overflow-y-auto"
+      animate={{ backgroundColor: bg.base }}
+      transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+    >
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: VIEW_BACKGROUNDS.dev.glow }}
+        animate={{ opacity: view === "dev" ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+      />
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: VIEW_BACKGROUNDS.vfx.glow }}
+        animate={{ opacity: view === "vfx" ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+      />
+      <div className="relative z-10 flex-1 flex justify-center px-6 py-[12vh] overflow-y-auto">
+        <LayoutGroup>
+          <motion.div
+            layout
+            className="relative flex flex-col items-start w-full md:w-auto max-w-2xl md:max-w-none pl-0 border-l-0 md:pl-8 md:border-l"
+            animate={{ borderColor: bg.border }}
+            transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
+          >
+            <Spotify />
+            <div className="flex items-center gap-4 md:gap-5 pt-6">
+              <GitHubProfile />
+              <AnimatedText
+                text="sebby"
+                element="h1"
+                className="text-5xl md:text-6xl font-bold whitespace-nowrap text-zinc-50"
+              />
+            </div>
+
+            <div key={`header-${view}`}>
+                <AnimatedText
+                  text={subtitle}
+                  element="p"
+                  className="text-zinc-500 mt-1"
+                  artificialDelay={0.05}
+                />
+
+                <div className="flex items-center gap-3 mt-2">
+                  {socials.map((social, i) => (
+                    <motion.a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.label}
+                      className={`text-zinc-500 transition-colors ${
+                        view === "vfx"
+                          ? "hover:text-violet-400"
+                          : "hover:text-emerald-400"
+                      }`}
+                      initial={SOCIAL_ANIMATION.initial}
+                      animate={SOCIAL_ANIMATION.animate(i)}
+                    >
+                      {SOCIAL_ICONS[social.label]}
+                    </motion.a>
+                  ))}
+                </div>
+            </div>
+
+            <ViewToggle />
+
+            <div key={`body-${view}`}>
+                <section className="mt-8">
+                  <AnimatedText
+                    text="about"
+                    element="h2"
+                    className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2"
+                    artificialDelay={0.15}
+                  />
+                  <AnimatedText
+                    text={about}
+                    element="p"
+                    className="text-zinc-400 text-sm max-w-xl leading-relaxed"
+                    artificialDelay={0.2}
+                    fast
+                  />
+                </section>
+
+                <Component {...pageProps} />
+            </div>
+
+            <noscript>
+              <p>developer</p>
+              <section>
+                <h2>about</h2>
+                <p>{ABOUT}</p>
+              </section>
+              <nav>
+                {SOCIALS.map((social) => (
+                  <a key={social.label} href={social.href}>
+                    {social.label}
+                  </a>
+                ))}
+              </nav>
+
+              <h2>work</h2>
+              {WORK_ITEMS.map((item) => (
+                <div key={item.slug}>
+                  <p>
+                    <strong>{item.company}</strong> — {item.role}
+                  </p>
+                  <p>{item.about}</p>
+                  <span>{item.date}</span>
+                </div>
+              ))}
+
+              <h2>projects</h2>
+              {PROJECTS.map((project) => (
+                <div key={project.slug}>
+                  <p>
+                    <strong>{project.name}</strong> — {project.role}
+                  </p>
+                  <p>{project.about}</p>
+                </div>
+              ))}
+            </noscript>
+
+            <p className="mt-12 text-xs text-zinc-600 font-mono">
+              site based on{" "}
+              <a
+                href="https://github.com/looskie/website"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-500 hover:text-emerald-500/80 transition-colors"
+              >
+                looskie/website
+              </a>
+            </p>
+          </motion.div>
+        </LayoutGroup>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function App({ Component, pageProps, router }: AppProps) {
   if (router.pathname === "/404") {
@@ -82,143 +256,12 @@ export default function App({ Component, pageProps, router }: AppProps) {
         />
       </Head>
 
-      <motion.div
-        className="flex flex-1 min-h-screen overflow-y-auto"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(52, 211, 153, 0.08), transparent)",
-        }}
-      >
-        <div className="flex-1 flex justify-center px-6 py-[12vh] overflow-y-auto">
-          <LayoutGroup>
-            <motion.div
-              layout
-              className="relative flex flex-col items-start w-full md:w-auto max-w-2xl md:max-w-none pl-0 border-l-0 md:pl-8 md:border-l md:border-zinc-800"
-            >
-              <Spotify />
-              <div className="flex items-center gap-4 md:gap-5 pt-6">
-                <GitHubProfile />
-                <AnimatedText
-                  text="sebby"
-                  element="h1"
-                  className="text-5xl md:text-6xl font-bold whitespace-nowrap text-zinc-50"
-                />
-              </div>
-
-              <AnimatedText
-                text="developer"
-                element="p"
-                className="text-zinc-500 mt-1"
-                artificialDelay={0.2}
-              />
-
-              <div className="flex items-center gap-3 mt-2">
-                {SOCIALS.map((social, i) => (
-                  <motion.a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="text-zinc-500 hover:text-emerald-400 transition-colors"
-                    initial={SOCIAL_ANIMATION.initial}
-                    animate={SOCIAL_ANIMATION.animate(i)}
-                  >
-                    {SOCIAL_ICONS[social.label]}
-                  </motion.a>
-                ))}
-              </div>
-
-              <motion.section
-                className="mt-8"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.6,
-                  ease: [0.2, 0.65, 0.3, 0.9],
-                  delay: 0.5,
-                }}
-              >
-                <AnimatedText
-                  text="about"
-                  element="h2"
-                  className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2"
-                  artificialDelay={0.5}
-                />
-                <AnimatedText
-                  text={ABOUT}
-                  element="p"
-                  className="text-zinc-400 text-sm max-w-xl leading-relaxed"
-                  artificialDelay={0.55}
-                  fast
-                />
-              </motion.section>
-
-              <Component {...pageProps} />
-
-              <noscript>
-                <p>developer</p>
-                <section>
-                  <h2>about</h2>
-                  <p>{ABOUT}</p>
-                </section>
-                <nav>
-                  {SOCIALS.map((social) => (
-                    <a key={social.label} href={social.href}>
-                      {social.label}
-                    </a>
-                  ))}
-                </nav>
-
-                <h2>work</h2>
-                {WORK_ITEMS.map((item) => (
-                  <div key={item.slug}>
-                    {item.clickable === false ? (
-                      <p>
-                        <strong>{item.company}</strong> — {item.role}
-                      </p>
-                    ) : (
-                      <a href={item.url}>
-                        <strong>{item.company}</strong> — {item.role}
-                      </a>
-                    )}
-                    <p>{item.about}</p>
-                    <span>{item.date}</span>
-                  </div>
-                ))}
-
-                <h2>projects</h2>
-                {PROJECTS.map((project) => (
-                  <div key={project.slug}>
-                    {project.clickable === false ? (
-                      <p>
-                        <strong>{project.name}</strong> — {project.role}
-                      </p>
-                    ) : (
-                      <a href={project.url}>
-                        <strong>{project.name}</strong> — {project.role}
-                      </a>
-                    )}
-                    <p>{project.about}</p>
-                  </div>
-                ))}
-              </noscript>
-
-              <p className="mt-12 text-xs text-zinc-600 font-mono">
-                site based on{" "}
-                <a
-                  href="https://github.com/looskie/website"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-zinc-500 hover:text-emerald-500/80 transition-colors"
-                >
-                  looskie/website
-                </a>
-              </p>
-            </motion.div>
-          </LayoutGroup>
-        </div>
-      </motion.div>
+      <ViewProvider>
+        <DetailPanelProvider>
+          <PortfolioShell Component={Component} pageProps={pageProps} />
+          <WorkDetailPanel />
+        </DetailPanelProvider>
+      </ViewProvider>
       <Analytics />
     </main>
   );

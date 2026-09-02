@@ -1,4 +1,6 @@
 import AnimatedText from "@/components/animated-text";
+import { VfxGrid } from "@/components/vfx-grid";
+import { useView } from "@/context/view-context";
 import { PROJECTS, WORK_ITEMS } from "@/utils/constants";
 import { motion } from "motion/react";
 import { memo } from "react";
@@ -36,14 +38,13 @@ const ItemRow = memo(function ItemRow({
     "group relative flex flex-col items-start pl-4 py-3 text-left rounded-r-md border-l-2 border-transparent hover:border-emerald-500/40 hover:bg-zinc-900/50 transition-all " +
     (clickable ? "cursor-pointer" : "cursor-default");
 
-  const titleClassName =
-    "font-semibold text-zinc-100 truncate group-hover:text-emerald-50/90 transition-colors";
-
   const inner = (
     <>
       <div className="flex items-baseline flex-wrap gap-x-4 gap-y-0.5">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className={titleClassName}>{label}</span>
+          <span className="font-semibold text-zinc-100 truncate group-hover:text-emerald-50/90 transition-colors">
+            {label}
+          </span>
           <span className="text-sm text-zinc-500 font-mono hidden sm:inline">
             {role}
           </span>
@@ -91,7 +92,7 @@ const ItemRow = memo(function ItemRow({
   );
 });
 
-export default function Home() {
+function DevContent() {
   return (
     <>
       <AnimatedText
@@ -139,4 +140,10 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+export default function Home() {
+  const { view } = useView();
+
+  return view === "dev" ? <DevContent /> : <VfxGrid />;
 }
