@@ -100,7 +100,7 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
         <LayoutGroup>
           <motion.div
             layout
-            className="relative flex flex-col items-start w-full md:w-auto max-w-2xl md:max-w-none pl-0 border-l-0 md:pl-8 md:border-l"
+            className="relative flex flex-col items-start w-full md:w-auto max-w-2xl md:max-w-none pl-0 border-l-0 md:pl-8 md:border-l md:border-zinc-800"
             animate={{ borderColor: bg.border }}
             transition={{ duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }}
           >
@@ -115,55 +115,58 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
             </div>
 
             <div key={`header-${view}`}>
-                <AnimatedText
-                  text={subtitle}
-                  element="p"
-                  className="text-zinc-500 mt-1"
-                  artificialDelay={0.05}
-                />
+              <AnimatedText
+                key={`subtitle-${view}`}
+                text={subtitle}
+                element="p"
+                className="text-zinc-500 mt-1"
+                artificialDelay={0.05}
+              />
 
-                <div className="flex items-center gap-3 mt-2">
-                  {socials.map((social, i) => (
-                    <motion.a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={social.label}
-                      className={`text-zinc-500 transition-colors ${
-                        view === "vfx"
-                          ? "hover:text-violet-400"
-                          : "hover:text-emerald-400"
-                      }`}
-                      initial={SOCIAL_ANIMATION.initial}
-                      animate={SOCIAL_ANIMATION.animate(i)}
-                    >
-                      {SOCIAL_ICONS[social.label]}
-                    </motion.a>
-                  ))}
-                </div>
+              <div className="flex items-center gap-3 mt-2">
+                {socials.map((social, i) => (
+                  <motion.a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className={`text-zinc-500 transition-colors ${
+                      view === "vfx"
+                        ? "hover:text-violet-400"
+                        : "hover:text-emerald-400"
+                    }`}
+                    initial={SOCIAL_ANIMATION.initial}
+                    animate={SOCIAL_ANIMATION.animate(i)}
+                  >
+                    {SOCIAL_ICONS[social.label]}
+                  </motion.a>
+                ))}
+              </div>
             </div>
 
             <ViewToggle />
 
             <div key={`body-${view}`}>
-                <section className="mt-8">
-                  <AnimatedText
-                    text="about"
-                    element="h2"
-                    className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2"
-                    artificialDelay={0.15}
-                  />
-                  <AnimatedText
-                    text={about}
-                    element="p"
-                    className="text-zinc-400 text-sm max-w-xl leading-relaxed"
-                    artificialDelay={0.2}
-                    fast
-                  />
-                </section>
+              <section className="mt-8">
+                <AnimatedText
+                  key={`about-heading-${view}`}
+                  text="about"
+                  element="h2"
+                  className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2"
+                  artificialDelay={0.15}
+                />
+                <AnimatedText
+                  key={`about-body-${view}`}
+                  text={about}
+                  element="p"
+                  className="text-zinc-400 text-sm max-w-xl leading-relaxed"
+                  artificialDelay={0.2}
+                  fast
+                />
+              </section>
 
-                <Component {...pageProps} />
+              <Component {...pageProps} />
             </div>
 
             <noscript>

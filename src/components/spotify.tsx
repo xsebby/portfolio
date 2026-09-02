@@ -6,7 +6,7 @@ const EQUALIZER_DELAYS = [0, 0.15, 0.3];
 
 const EQUALIZER_ANIMATION = {
   animate: {
-    scaleY: [2, 10, 4, 8, 2].map((h) => h / 10), // the max height is tw's 2.5 = 10px
+    scaleY: [2, 10, 4, 8, 2].map((h) => h / 10),
   },
   transition: {
     duration: 1.5,
@@ -103,20 +103,16 @@ export function Spotify() {
           initial={SPOTIFY_PILL_ANIMATION.initial}
           exit={SPOTIFY_PILL_ANIMATION.initial}
           transition={SPOTIFY_PILL_ANIMATION.transition}
-          className="will-change-[transform,opacity,filter] grid" // for whatever reason, this needs to be grid... otherwise safari has a spazm, bit too lazy to find out why... its gotta do with something with the LayoutGroup though.
+          className="will-change-[transform,opacity,filter] grid"
         >
           <motion.div
             layout
-            style={{
-              borderRadius: 9999,
-            }}
+            style={{ borderRadius: 9999 }}
             className="absolute -top-6 left-0 p-0.5 overflow-hidden bg-zinc-800/80 min-w-40 max-w-52 rounded-full"
           >
             <motion.div
               layout
-              style={{
-                borderRadius: 9999,
-              }}
+              style={{ borderRadius: 9999 }}
               className="relative flex gap-2 items-center px-2 py-1 bg-zinc-900 overflow-hidden rounded-[9999px]"
             >
               <AnimatePresence mode="popLayout">

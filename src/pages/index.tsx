@@ -2,8 +2,7 @@ import AnimatedText from "@/components/animated-text";
 import { VfxGrid } from "@/components/vfx-grid";
 import { useView } from "@/context/view-context";
 import { PROJECTS, WORK_ITEMS } from "@/utils/constants";
-import { motion } from "motion/react";
-import { memo } from "react";
+import { motion } from "motion/react";import { memo } from "react";
 
 const ITEM_ANIMATION = {
   initial: { opacity: 0, y: 5, filter: "blur(4px)" },

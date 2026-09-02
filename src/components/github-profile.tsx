@@ -39,9 +39,7 @@ export function GitHubProfile() {
   }, [view]);
 
   const avatarUrl =
-    view === "vfx"
-      ? VFX_AVATAR_URL || DEV_AVATAR_URL
-      : DEV_AVATAR_URL;
+    view === "vfx" ? VFX_AVATAR_URL || DEV_AVATAR_URL : DEV_AVATAR_URL;
 
   return (
     <motion.div
