@@ -10,15 +10,15 @@ export function ViewToggle() {
     <button
       type="button"
       onClick={toggleView}
-      className={`mt-2 text-zinc-500 transition-colors cursor-pointer text-left ${
+      className={`text-zinc-500 transition-colors cursor-pointer text-left leading-none ${
         view === "vfx" ? "hover:text-violet-400" : "hover:text-emerald-400"
       }`}
     >
-      <span key={view} className="inline-block">
+      <span key={view} className="inline-block leading-none">
         <AnimatedText
           text={label}
           element="span"
-          className="text-zinc-500"
+          className="text-zinc-500 leading-none"
           artificialDelay={0.35}
           fast
         />

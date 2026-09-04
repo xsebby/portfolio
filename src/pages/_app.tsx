@@ -114,16 +114,19 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
               />
             </div>
 
-            <div key={`header-${view}`}>
+            <div
+              key={`header-${view}`}
+              className="mt-3 flex flex-col gap-2.5"
+            >
               <AnimatedText
                 key={`subtitle-${view}`}
                 text={subtitle}
                 element="p"
-                className="text-zinc-500 mt-1"
+                className="text-zinc-500 leading-none"
                 artificialDelay={0.05}
               />
 
-              <div className="flex items-center gap-3 mt-2">
+              <div className="flex items-center gap-3">
                 {socials.map((social, i) => (
                   <motion.a
                     key={social.label}
@@ -143,9 +146,9 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
                   </motion.a>
                 ))}
               </div>
-            </div>
 
-            <ViewToggle />
+              <ViewToggle />
+            </div>
 
             <div key={`body-${view}`}>
               <section className="mt-8">
