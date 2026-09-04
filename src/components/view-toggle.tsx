@@ -10,7 +10,7 @@ export function ViewToggle() {
     <button
       type="button"
       onClick={toggleView}
-      className={`text-zinc-500 transition-colors cursor-pointer text-left leading-none ${
+      className={`p-0 m-0 bg-transparent border-0 text-zinc-500 transition-colors cursor-pointer text-left leading-none ${
         view === "vfx" ? "hover:text-violet-400" : "hover:text-emerald-400"
       }`}
     >

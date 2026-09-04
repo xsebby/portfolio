@@ -116,17 +116,19 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
 
             <div
               key={`header-${view}`}
-              className="mt-3 flex flex-col gap-2.5"
+              className="mt-3 flex flex-col gap-2"
             >
-              <AnimatedText
-                key={`subtitle-${view}`}
-                text={subtitle}
-                element="p"
-                className="text-zinc-500 leading-none"
-                artificialDelay={0.05}
-              />
+              <div className="flex h-5 items-center">
+                <AnimatedText
+                  key={`subtitle-${view}`}
+                  text={subtitle}
+                  element="p"
+                  className="text-zinc-500 leading-none"
+                  artificialDelay={0.05}
+                />
+              </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex h-5 items-center gap-3">
                 {socials.map((social, i) => (
                   <motion.a
                     key={social.label}
@@ -134,7 +136,7 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className={`text-zinc-500 transition-colors ${
+                    className={`flex items-center text-zinc-500 transition-colors ${
                       view === "vfx"
                         ? "hover:text-violet-400"
                         : "hover:text-emerald-400"
@@ -147,7 +149,9 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
                 ))}
               </div>
 
-              <ViewToggle />
+              <div className="flex h-5 items-center">
+                <ViewToggle />
+              </div>
             </div>
 
             <div key={`body-${view}`}>
