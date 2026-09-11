@@ -3,7 +3,8 @@ import { VfxGrid } from "@/components/vfx-grid";
 import { useView } from "@/context/view-context";
 import { PROJECTS, WORK_ITEMS } from "@/utils/constants";
 import Link from "next/link";
-import { motion } from "motion/react";import { memo } from "react";
+import { motion } from "motion/react";
+import { memo } from "react";
 
 const ITEM_ANIMATION = {
   initial: { opacity: 0, y: 5, filter: "blur(4px)" },
@@ -95,14 +96,6 @@ const ItemRow = memo(function ItemRow({
 function DevContent() {
   return (
     <>
-      <section className="mt-8">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-3">teaching</h2>
-        <Link href="/presentations" className="block pl-4 py-3 border-l-2 border-transparent hover:border-emerald-500/40 hover:bg-zinc-900/50 transition-colors">
-          <span className="font-semibold text-zinc-100">CS 211 · Computer Architecture</span>
-          <span className="block text-sm text-zinc-400 mt-1">Recitation slides and interactive examples at Rutgers.</span>
-          <span className="block text-xs font-mono text-emerald-400 mt-2">view presentations ↗</span>
-        </Link>
-      </section>
       <AnimatedText
         text="work"
         element="h2"
@@ -146,6 +139,19 @@ function DevContent() {
           />
         ))}
       </div>
+
+      <motion.div
+        className="mt-10"
+        initial={ITEM_ANIMATION.initial}
+        animate={ITEM_ANIMATION.animate(0.95)}
+      >
+        <Link
+          href="/presentations"
+          className="text-xs font-mono text-zinc-600 hover:text-emerald-500/80 transition-colors"
+        >
+          teaching notes
+        </Link>
+      </motion.div>
     </>
   );
 }
