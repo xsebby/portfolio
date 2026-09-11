@@ -1,0 +1,133 @@
+[
+  {
+    "title": "Bits, rotations & iLab",
+    "section": "CS 211 · Recitation 01",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "HW1 reminder\nConnecting through SSH\nBitwise operators and HW2",
+    "caption": "",
+    "notes": "Suggested pacing for a 50-minute section: reminders 3 min, SSH demo 8 min, operators and shifts 12 min, rotations 15 min, practice 8 min, wrap-up 4 min. Ask who has already connected to iLab. Adjust pacing to the room."
+  },
+  {
+    "title": "Contact",
+    "section": "CS 211 · Recitation 01",
+    "lead": "Sebastian Raducha\nTeaching Assistant / Grader",
+    "example": "sebastian.raducha@rutgers.edu",
+    "caption": "",
+    "notes": "Contact email supplied by the TA: sebastian.raducha@rutgers.edu."
+  },
+  {
+    "title": "HW1 is due September 14",
+    "section": "Before we start",
+    "lead": "Check Canvas for the exact deadline and submission instructions.\n\nTry compiling and running on iLab before the deadline.",
+    "example": "Today’s checkpoint\n\nCan you log in?\nCan you find your files?\nCan you run your program?",
+    "caption": "",
+    "notes": "Due date supplied by the TA. September is inferred from the recitation context. Do not announce a specific deadline time or late policy without checking Canvas."
+  },
+  {
+    "title": "Connecting to iLab",
+    "section": "SSH",
+    "lead": "Open Terminal on macOS/Linux or PowerShell on Windows.\n\nReplace YOUR_NETID with your Rutgers NetID. Enter your password when prompted.",
+    "example": "ssh YOUR_NETID@ilab.cs.rutgers.edu\n\npwd\nls\nmkdir cs211\ncd cs211\n\nexit",
+    "caption": "After SSH connects, commands run on the remote iLab computer.",
+    "notes": "SSH is like a remote keyboard connected to another computer. Your terminal stays on your laptop, but commands and files are on iLab. Password typing usually shows no characters. Rutgers currently says eligible users need no activation and use their University password, except CS 2FA users who use their S Password. Follow the account’s authentication prompts. Verify unfamiliar host fingerprints through Rutgers support. Source: https://resources.cs.rutgers.edu/docs/instructional-lab/",
+    "source": "https://resources.cs.rutgers.edu/docs/instructional-lab/"
+  },
+  {
+    "title": "A terminal workflow",
+    "section": "SSH",
+    "lead": "Everyone should be able to SSH into iLab. Your editor is a personal choice.\n\nRun these commands in the iLab folder containing your homework files.",
+    "example": "pwd\nls\ngcc hw2.c -o hw2\n./hw2 16 32 1\nbash test_hw2.sh",
+    "caption": "SSH gives access. File transfer is a separate step.",
+    "notes": "Demonstrate pwd, ls, mkdir, and cd before compiling. ./ means the executable in the current directory. To copy from a local folder containing both files, use a separate local terminal: scp hw2.c test_hw2.sh YOUR_NETID@ilab.cs.rutgers.edu:~/ . The destination is the remote home folder. Then SSH and cd ~. Do not type the final explanatory period. Run the test script in the assignment folder: it replaces the executable named hw2. Students should use the course-provided starter files, not the instructor solution. Source for compile/run/test commands: supplied test_hw2.sh."
+  },
+  {
+    "title": "HW2: a rotation within a width",
+    "section": "The task",
+    "lead": "Three arguments: a value, a bit width, and a signed rotation count.\n\nStore the value in 64 bits. Rotate within the width given by argument 2.\n\nPositive count: right.\nNegative count: left.\nZero: unchanged.",
+    "example": "./hw2 179 8 2\n\nStart:   10110011\nResult:  11101100",
+    "caption": "The handout uses atoll to read the value into a long long int.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/hw2.html . The handout specifies three arguments: value, selected width, and rotation count. Store the value in 64 bits using long long int and parse it with atoll. Positive rotation counts mean right, negative mean left. The handout says positive input values will be tested; the supplied script also tests zero. Print in eight-bit groups starting at the most significant displayed bit. Return 0 on success and 1 without output for an incorrect number of inputs. 8-bit examples are directly supported by the handout. 179 = 128 + 32 + 16 + 2 + 1.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/hw2.html",
+    "sourceLabel": "HW2 assignment handout"
+  },
+  {
+    "title": "Bitwise operators",
+    "section": "Operator toolbox",
+    "lead": "&  AND: 1 only when both bits are 1\n\n|  OR: 1 when either bit is 1\n\n^  XOR: 1 when the bits differ\n\n~  NOT: flip each bit",
+    "example": "a       1010\nb       1100\n\na & b   1000\na | b   1110\na ^ b   0110\n~a      0101  (4 bits)",
+    "caption": "Each column is independent. In C, ^ means XOR, not exponentiation.",
+    "notes": "Use two rows of four switches. AND requires both switches on, OR requires at least one, XOR requires different states. NOT is a unary operator even though it operates on binary digits. ~ in C flips the promoted integer type’s bits, so 0101 here shows only four bits. HW2’s core operations are &, |, << and >>. XOR and NOT complete the basic toolbox."
+  },
+  {
+    "title": "Bitwise versus logical",
+    "section": "Operator toolbox",
+    "lead": "& and | combine individual bits.\n\n&& and || test whether values are zero or nonzero. Their result is 0 or 1.\n\nx |= y is shorthand for x = x | y.",
+    "example": "6 & 3    = 2\n0110\n0011\n0010\n\n6 && 3   = 1\nBoth values are nonzero.",
+    "caption": "Masks and rotations need bitwise operations.",
+    "notes": "Logical operators also short-circuit: && skips the right operand when the left is false, || skips it when the left is true. Bitwise operators evaluate both operands. ! produces logical negation, whereas ~ flips bits. Ask students to explain 4 & 2 versus 4 && 2. Answers: 0 and 1."
+  },
+  {
+    "title": "Shifts move bits",
+    "section": "Shifts",
+    "lead": "<< moves bits toward higher positions.\n\n>> moves bits toward lower positions.\n\nFor unsigned values, right shift fills with zeros.",
+    "example": "8-bit view\n\nStart      10110011\nRight 2    00101100\nLeft 2     11001100",
+    "caption": "These rows show only 8 bits. A rotation must recover bits that leave that width.",
+    "notes": "Analogy: people moving along a row of eight chairs. At the end, someone falls off. In a rotation the row becomes a circle. These are fixed-width conceptual shifts: in C, a small integer may be promoted to int before shifting, so an 8-bit view may require a mask. Use unsigned storage for bit manipulation."
+  },
+  {
+    "title": "Masks select bit positions",
+    "section": "Masks",
+    "lead": "A mask has 1s at the positions you want to keep.\n\nAND keeps those positions and clears the rest.\n\nFor a right rotation by 2, save the lowest 2 bits.",
+    "example": "Number   10110011\nMask     00000011\n         --------\nAND      00000011\n\nLow 2 bits saved: 11",
+    "caption": "A 1 in the mask keeps the original bit. It does not force that bit to 1.",
+    "notes": "Analogy: a stencil with holes. A hole lets the existing mark through, even if it is zero. Build a mask conceptually by OR-ing one-bit values at positions 0 through k-1. Use a suitably wide unsigned literal in C, for example 1ULL, with shift counts below that type’s width."
+  },
+  {
+    "title": "Right rotation by 2",
+    "section": "Rotations",
+    "lead": "Start with 10110011.\n\nShift the main part right by 2.\nSave the low 2 bits.\nMove them into the top 2 positions.\nOR the pieces together.",
+    "example": "Shifted    00101100\nSaved      00000011\nWrapped    11000000\n           --------\nOR result  11101100",
+    "caption": "The saved bits move left by 8 − 2 = 6 positions.",
+    "notes": "Draw 101100 | 11. Move the right-hand group to the front without reversing its order: 11 | 101100. Use a second color for the wrapped bits. OR works because the two pieces occupy disjoint positions. Keep the width visible throughout."
+  },
+  {
+    "title": "Left rotation by 2",
+    "section": "Rotations",
+    "lead": "Start with 10110011 again.\n\nSave the top 2 bits.\nShift the main part left by 2.\nMove the saved bits to the bottom.\nOR and keep the selected width.",
+    "example": "Shifted    11001100\nSaved top  10\nWrapped    00000010\n           --------\nOR result  11001110",
+    "caption": "10 | 110011 becomes 110011 | 10. Bit order stays the same.",
+    "notes": "Compare this slide to the right rotation: same number and count, different direction and result. The top positions depend on the selected width. A constant that selects bit 31 cannot select the top bit of every possible width. The shifted row is the low 8 bits of the mathematical shift."
+  },
+  {
+    "title": "A full turn changes nothing",
+    "section": "Rotation counts",
+    "lead": "For a width of W, every W rotations returns to the start.\n\nReduce the count using remainder.\n\nIf the reduced count is zero, keep the number unchanged within W bits.",
+    "example": "Width 8\n\nRight 10 = right 2\nLeft 18  = left 2\nRight 8  = unchanged\n\n10 % 8   = 2\n-10 % 8  = -2  in C",
+    "caption": "In C, a negative dividend can produce a negative remainder.",
+    "notes": "Analogy: moving around eight seats on a carousel. One full lap is invisible in the result. Preserve the assignment’s direction convention. For nonzero W, C remainder has the sign of the dividend. Never use a negative value directly as a shift count. Handle zero before evaluating a generic expression that might shift by the storage type’s full width."
+  },
+  {
+    "title": "C details that matter",
+    "section": "Implementation checks",
+    "lead": "Use unsigned values for bit manipulation.\n\nThe selected bit width and the storage type’s width can differ.\n\nA shift count must be nonnegative and smaller than the promoted left operand’s width.",
+    "example": "Check before shifting\n\nIs W valid?\nIs the count reduced?\nIs the count zero?\nIs the mask wide enough?\nAre only W result bits kept?",
+    "caption": "A 32-bit mask cannot describe the top of a 40-bit value.",
+    "notes": "The formal handout must define valid widths and number ranges. In common C modes on iLab, signed right shift of a negative value is implementation-defined and signed left shift can be undefined. Prefer an unsigned type and a matching literal such as 1ULL. Even an unsigned shift by the type’s width is undefined. A full-width mask needs a special case. Do not present a generic two-shift expression without discussing zero and full-width counts."
+  },
+  {
+    "title": "Your turn",
+    "section": "Board practice",
+    "lead": "Use an 8-bit width.\n\n1. Rotate 10010110 right by 3.\n\n2. Rotate 10010110 left by 1.\n\n3. Rotate it right by 11.",
+    "example": "Explain your steps\n\nWhich bits leave?\nWhere do they re-enter?\nWhat mask selects them?\nHow can you check the result?",
+    "caption": "Take a minute to draw the bits before writing C.",
+    "notes": "Give quiet thinking time, then have students compare with a neighbor. Ask a student to draw the cut between the main group and wrapped group. Do not reveal the next slide until students have explained a result."
+  },
+  {
+    "title": "Practice answers",
+    "section": "Board practice",
+    "lead": "Right 3 saves the low group 110.\n\nLeft 1 saves the high bit 1.\n\nRight 11 is right 3 because 11 % 8 = 3.",
+    "example": "Start      10010110\n\nRight 3    11010010\nLeft 1     00101101\nRight 11   11010010",
+    "caption": "Rotations preserve the number of 1 bits. Opposite rotations undo each other.",
+    "notes": "The low-three-bit mask is 00000111. The top-one-bit mask at width eight is 10000000. Ask why preserving the number of 1s is a useful check but does not uniquely prove the rotation is correct. Close with the HW1 reminder and a request that everyone test SSH before the next meeting."
+  }
+]

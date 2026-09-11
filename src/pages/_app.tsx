@@ -71,7 +71,7 @@ const VIEW_BACKGROUNDS = {
   },
 } as const;
 
-function PortfolioShell({ Component, pageProps }: AppProps) {
+function PortfolioShell({ Component, pageProps }: Pick<AppProps, "Component" | "pageProps">) {
   const { view } = useView();
   const socials = view === "dev" ? SOCIALS : VFX_SOCIALS;
   const subtitle = view === "dev" ? "developer" : "vfx artist";
@@ -231,6 +231,10 @@ function PortfolioShell({ Component, pageProps }: AppProps) {
 }
 
 export default function App({ Component, pageProps, router }: AppProps) {
+  if (router.pathname.startsWith("/presentations")) {
+    return <><Component {...pageProps} /><Analytics /></>;
+  }
+
   if (router.pathname === "/404") {
     return (
       <>
