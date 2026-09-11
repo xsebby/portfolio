@@ -21,7 +21,9 @@
     "lead": "Check Canvas for the exact deadline and submission instructions.\n\nTry compiling and running on iLab before the deadline.",
     "example": "Today’s checkpoint\n\nCan you log in?\nCan you find your files?\nCan you run your program?",
     "caption": "",
-    "notes": "Due date supplied by the TA. September is inferred from the recitation context. Do not announce a specific deadline time or late policy without checking Canvas."
+    "notes": "Due date supplied by the TA. September is inferred from the recitation context. Do not announce a specific deadline time or late policy without checking Canvas. HW1 handout: https://firner.com/presentations/cs211/2026-Fall/hw1.html .",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/hw1.html",
+    "sourceLabel": "HW1 assignment handout"
   },
   {
     "title": "Connecting to iLab",
@@ -44,9 +46,9 @@
     "title": "HW2: a rotation within a width",
     "section": "The task",
     "lead": "Three arguments: a value, a bit width, and a signed rotation count.\n\nStore the value in 64 bits. Rotate within the width given by argument 2.\n\nPositive count: right.\nNegative count: left.\nZero: unchanged.",
-    "example": "./hw2 179 8 2\n\nStart:   10110011\nResult:  11101100",
-    "caption": "The handout uses atoll to read the value into a long long int.",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/hw2.html . The handout specifies three arguments: value, selected width, and rotation count. Store the value in 64 bits using long long int and parse it with atoll. Positive rotation counts mean right, negative mean left. The handout says positive input values will be tested; the supplied script also tests zero. Print in eight-bit groups starting at the most significant displayed bit. Return 0 on success and 1 without output for an incorrect number of inputs. 8-bit examples are directly supported by the handout. 179 = 128 + 32 + 16 + 2 + 1.",
+    "example": "./hw2 1 8 -1\nStart:   00000001\nResult:  00000010\n\n./hw2 1 4 1\nStart:   0001\nResult:  1000\n\n./hw2 8 10 0\nStart:   00000010 00\nResult:  00000010 00",
+    "caption": "Output is printed in groups of 8 bits. The handout uses atoll to read the value into a long long int.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/hw2.html . The handout specifies three arguments: value, selected width, and rotation count. Store the value in 64 bits using long long int and parse it with atoll. Positive rotation counts mean right, negative mean left. The handout says positive input values will be tested; the supplied script also tests zero. Print in eight-bit groups starting at the most significant displayed bit. Return 0 on success and 1 without output for an incorrect number of inputs. All three commands and outputs are copied from the handout’s example list: 1 8 -1 is a left rotation, 1 4 1 is a right rotation within a 4-bit width, and 8 10 0 shows that grouping starts at the top bit, so 00000010 00 is correct and 00 00001000 fails the test script.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/hw2.html",
     "sourceLabel": "HW2 assignment handout"
   },
