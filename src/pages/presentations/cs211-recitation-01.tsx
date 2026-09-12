@@ -166,7 +166,7 @@ export default function Recitation() {
           <button type="button" onClick={fullscreen}>
             Fullscreen
           </button>
-          <a href="/presentations/cs211-recitation-01.pptx" download>
+          <a href="/presentations/CS211_Recitation_1.pptx" download>
             PowerPoint ↓
           </a>
         </div>
