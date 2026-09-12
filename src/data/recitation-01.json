@@ -88,7 +88,7 @@
     "title": "Right rotation by 2",
     "section": "Rotations",
     "lead": "Start with 10110011.\n\nShift the main part right by 2.\nSave the low 2 bits.\nMove them into the top 2 positions.\nOR the pieces together.",
-    "example": "Shifted    00101100\nSaved      00000011\nWrapped    11000000\n           --------\nOR result  11101100",
+    "example": "Saved      00000011\nShifted    00101100\nWrapped    11000000\n           --------\nOR result  11101100",
     "caption": "The saved bits move left by 8 − 2 = 6 positions.",
     "notes": "Draw 101100 | 11. Move the right-hand group to the front without reversing its order: 11 | 101100. Use a second color for the wrapped bits. OR works because the two pieces occupy disjoint positions. Keep the width visible throughout."
   },
@@ -96,7 +96,7 @@
     "title": "Left rotation by 2",
     "section": "Rotations",
     "lead": "Start with 10110011 again.\n\nSave the top 2 bits.\nShift the main part left by 2.\nMove the saved bits to the bottom.\nOR and keep the selected width.",
-    "example": "Shifted    11001100\nSaved top  10\nWrapped    00000010\n           --------\nOR result  11001110",
+    "example": "Saved top  10\nShifted    11001100\nWrapped    00000010\n           --------\nOR result  11001110",
     "caption": "10 | 110011 becomes 110011 | 10. Bit order stays the same.",
     "notes": "Compare this slide to the right rotation: same number and count, different direction and result. The top positions depend on the selected width. A constant that selects bit 31 cannot select the top bit of every possible width. The shifted row is the low 8 bits of the mathematical shift."
   },
@@ -109,17 +109,9 @@
     "notes": "Analogy: moving around eight seats on a carousel. One full lap is invisible in the result. Preserve the assignment’s direction convention. For nonzero W, C remainder has the sign of the dividend. Never use a negative value directly as a shift count. Handle zero before evaluating a generic expression that might shift by the storage type’s full width."
   },
   {
-    "title": "C details that matter",
-    "section": "Implementation checks",
-    "lead": "Use unsigned values for bit manipulation.\n\nThe selected bit width and the storage type’s width can differ.\n\nA shift count must be nonnegative and smaller than the promoted left operand’s width.",
-    "example": "Check before shifting\n\nIs W valid?\nIs the count reduced?\nIs the count zero?\nIs the mask wide enough?\nAre only W result bits kept?",
-    "caption": "A 32-bit mask cannot describe the top of a 40-bit value.",
-    "notes": "The formal handout must define valid widths and number ranges. In common C modes on iLab, signed right shift of a negative value is implementation-defined and signed left shift can be undefined. Prefer an unsigned type and a matching literal such as 1ULL. Even an unsigned shift by the type’s width is undefined. A full-width mask needs a special case. Do not present a generic two-shift expression without discussing zero and full-width counts."
-  },
-  {
     "title": "Your turn",
     "section": "Board practice",
-    "lead": "Use an 8-bit width.\n\n1. Rotate 10010110 right by 3.\n\n2. Rotate 10010110 left by 1.\n\n3. Rotate it right by 11.",
+    "lead": "Use an 8-bit width.\n\n1. Rotate 10010110 right by 3.\n\n2. Rotate 10010110 left by 1.\n\n3. Rotate 10010110 right by 11.",
     "example": "Explain your steps\n\nWhich bits leave?\nWhere do they re-enter?\nWhat mask selects them?\nHow can you check the result?",
     "caption": "Take a minute to draw the bits before writing C.",
     "notes": "Give quiet thinking time, then have students compare with a neighbor. Ask a student to draw the cut between the main group and wrapped group. Do not reveal the next slide until students have explained a result."
