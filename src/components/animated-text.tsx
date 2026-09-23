@@ -33,12 +33,11 @@ const AnimatedText = ({
   } as const satisfies Variants;
 
   const wrapClass = element === "p" ? "whitespace-normal" : "whitespace-nowrap";
-  const Children = text.split(" ").map((word, index) => (
+  const animated = text.split(" ").map((word, index) => (
     <motion.span
       // biome-ignore lint/suspicious/noArrayIndexKey: cry harder
       key={index}
       className={`inline-block mr-[0.25em] ${wrapClass} will-change-transform`}
-      aria-hidden="true"
       initial="initial"
       animate="animate"
       transition={{
@@ -46,12 +45,11 @@ const AnimatedText = ({
         staggerChildren: stagger,
       }}
     >
-      {[...word].map((character, index) => (
+      {[...word].map((character, charIndex) => (
         <motion.span
           // biome-ignore lint/suspicious/noArrayIndexKey: cry harder
-          key={index}
+          key={charIndex}
           className="inline-block"
-          aria-hidden="true"
           custom={word.length}
           variants={charVariants}
         >
@@ -61,7 +59,16 @@ const AnimatedText = ({
     </motion.span>
   ));
 
-  return React.createElement(element, { className }, Children);
+  // Animated glyphs are decorative; expose the full string to assistive tech
+  // so headings/buttons aren't reported as empty (axe: empty-heading, button-name).
+  return React.createElement(
+    element,
+    { className },
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{animated}</span>
+    </>,
+  );
 };
 
 export default AnimatedText;
