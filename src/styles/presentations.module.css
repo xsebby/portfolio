@@ -229,6 +229,11 @@
   max-width: 780px;
   font-size: clamp(48px, 6vw, 84px);
 }
+.recitationThree .cover h1,
+.recitationThree .cover h2 {
+  max-width: none;
+  font-size: clamp(42px, 5vw, 64px);
+}
 .controls {
   justify-content: space-between;
   padding: 18px 32px;
@@ -332,7 +337,8 @@
   padding: 14px 0;
   font: 40px var(--font-mono);
 }
-.bits > [data-wrap="true"], .viewer .bits > button[data-wrap="true"] {
+.bits > [data-wrap="true"],
+.viewer .bits > button[data-wrap="true"] {
   color: #09090b;
   background: #6ee7b7;
   border-color: #6ee7b7;

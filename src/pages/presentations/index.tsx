@@ -55,6 +55,29 @@ export default function Presentations() {
             </div>
           </div>
         </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>03</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 03</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-03">
+                Reading assembly without panic
+              </Link>
+            </h3>
+            <p>
+              Worked examples for x86-64 operands, branches, stack frames, and
+              arrays from lectures 6–8.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-03">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="/presentations/CS211_Recitation_3.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
       </section>
       <footer className={styles.hubFooter}>
         Course deadlines and submission details live on Canvas.
