@@ -1,11 +1,11 @@
 [
   {
-    "title": "Floating point and assembly",
+    "title": "Floating point numbers",
     "section": "CS 211 · Recitation 03",
-    "lead": "Build a number in a small floating point format, then read the assembly and memory ideas from lectures 6–8.",
-    "example": "Today’s path\n\nFraction → binary → fields\nNormal and subnormal values\nRead short x86-64 instructions\nFollow the stack and arrays",
-    "caption": "We will use a tiny practice format so every bit has a visible job.",
-    "notes": "Suggested 50-minute pacing: floating point walkthrough and practice 20 min; assembly operands and tracing 16 min; branches, stack, and arrays 14 min. This teaches the concepts behind the professor's planned assignment without displaying its unreleased prompt or solution. Sources: lectures 6–8 and the professor's description supplied by the TA.",
+    "lead": "Build and decode numbers in a small floating point format. We will work through the bits before worrying about implementation.",
+    "example": "Today’s path\n\nBinary fractions\nExponent and significand fields\nNormal and subnormal values\nPractice with ratios and bit patterns",
+    "caption": "Every example uses a tiny format so every bit has a visible job.",
+    "notes": "Suggested 50-minute pacing: binary place values and fields 8 min; normal values 12 min; subnormals and the boundary 12 min; decoding and encoding practice 12 min; rounding and recap 6 min. This teaches the concepts behind the professor’s planned assignment without displaying its unreleased prompt or solution. Source: lecture 6 and the professor’s description supplied by the TA.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
@@ -16,6 +16,16 @@
     "example": "Practice format\n\n S  |  EEE  |  FFF\n 0  |  011  |  010\n\n1 sign bit, 3 exponent bits,\n3 stored fraction bits",
     "caption": "Normal values also have a leading 1 that is implied rather than stored.",
     "notes": "The planned assignment accepts exponent-bit count, bias, significand-bit count, numerator, and denominator. Do not present this as the released homework. Explain that these are stored fields, not decimal digits. Here F means the integer represented by the three fraction bits. Lecture 6 reviews normal and subnormal equations.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "Binary fractions use halves",
+    "section": "Floating point · place values",
+    "lead": "Digits after a binary point are worth 1/2, 1/4, 1/8, and so on. A zero means that place contributes nothing.\n\nAdd the places marked 1 to find the value.",
+    "example": "0.101₂\n\n1 × 1/2 = 1/2\n0 × 1/4 = 0\n1 × 1/8 = 1/8\n\nTotal = 5/8",
+    "caption": "Ask students to read 0.011₂ aloud as 1/4 + 1/8 = 3/8.",
+    "notes": "Draw place-value columns before introducing exponent fields. This bridges base-2 arithmetic to the 5/4 and 3/16 examples. The 0.101₂ example equals 0.625.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
@@ -50,6 +60,16 @@
     "sourceLabel": "Lecture 6"
   },
   {
+    "title": "Decode a normal bit pattern",
+    "section": "Floating point · worked example",
+    "lead": "Read the exponent field as an unsigned integer, then subtract the bias. Read the fraction field as F/8.\n\nBecause E is not zero, include the implied leading 1.",
+    "example": "Bits: 0 | 010 | 101\n\nE = 2, so e = 2 − 3 = −1\nF = 5, so 1 + F/8 = 13/8\n\nValue = (13/8) × 2⁻¹ = 13/16",
+    "caption": "The bit pattern is a recipe for a value, not the digits of that value.",
+    "notes": "Pause at each field and ask students what it means. The sign is zero. E=2 lies in the normal range, e=-1, and F=5. The value is 0.8125.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
     "title": "What happens below the normal range?",
     "section": "Floating point · subnormals",
     "lead": "The smallest positive normal value here is 1.000₂ × 2⁻² = 1/4.\n\nSmaller positive values use E = 0. They have no implied leading 1. Their exponent is fixed at 1 − bias.",
@@ -66,6 +86,36 @@
     "example": "S = 0\nE = 0 = 000₂\nF = 4 = 100₂\n\nFields: 0 | 000 | 100\n\nCheck: (4/8) × 2⁻² = 1/8",
     "caption": "The stored fraction is 100₂. There is no leading 1 in the subnormal formula.",
     "notes": "Contrast this with the normal 5/4 example. Students may try to store a negative exponent in E or include the hidden 1. Return to the formula to resolve both confusions.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "The normal–subnormal boundary",
+    "section": "Floating point · smallest values",
+    "lead": "The largest subnormal sits directly below the smallest normal. The exponent stays at −2 across this boundary, but the implied leading 1 appears only for the normal value.",
+    "example": "Largest subnormal: E=0, F=7\nvalue = 7/32\n\nSmallest normal: E=1, F=0\nvalue = 1/4 = 8/32\n\nGap = 1/32",
+    "caption": "Subnormals fill the gap between zero and the smallest normal.",
+    "notes": "Use the 3-exponent-bit, bias-3, 3-fraction-bit practice format. Largest subnormal is F=7, giving 7/32. Smallest normal is E=1,F=0, giving 2^(1−3)=1/4. This illustrates gradual underflow.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "Your turn: decode two patterns",
+    "section": "Floating point · practice",
+    "lead": "Use the same format: 3 exponent bits, bias 3, and 3 fraction bits.\n\nFor each pattern, classify it, find E and F, then calculate the value.",
+    "example": "A. 0 | 010 | 100\n   normal or subnormal?\n   value = ?\n\nB. 0 | 000 | 011\n   normal or subnormal?\n   value = ?",
+    "caption": "Check E first: it selects the equation.",
+    "notes": "Allow two to three minutes. A is normal: E=2,F=4, value (1+4/8)×2^-1=3/4. B is subnormal: E=0,F=3, value 3/32. Ask students to name the equation before calculating.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "Decode answers",
+    "section": "Floating point · check",
+    "lead": "A uses the normal equation because E = 2.\n\nB uses the subnormal equation because E = 0; there is no implied leading 1.",
+    "example": "A. 0 | 010 | 100\n   (1 + 4/8) × 2⁻¹ = 3/4\n\nB. 0 | 000 | 011\n   (3/8) × 2⁻² = 3/32",
+    "caption": "If the answer seems surprising, decode the same fields back into the formula.",
+    "notes": "Have students explain why B is not (1+3/8)×2^-3. The exponent for subnormals is fixed at 1−bias=-2, and the leading 1 is absent.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
@@ -100,163 +150,23 @@
     "sourceLabel": "Lecture 6"
   },
   {
-    "title": "One line of AT&T assembly",
-    "section": "Lecture 6–7 · reading order",
-    "lead": "Read the source first, then the destination. The destination changes.\n\nThe suffix says how much data is used: b = 1 byte, w = 2, l = 4, q = 8.",
-    "example": "movq $5, %rax\n\nmovq   move 8 bytes\n$5     literal value 5\n%rax   destination register\n\nAfterward: %rax = 5",
-    "caption": "AT&T syntax is the format used in these lectures and by GCC’s default assembly output.",
-    "notes": "Ask students to point to the value that changes. Contrast Intel syntax only if a student asks: its operand order is reversed. Source: lectures 6 and 7.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Three kinds of operands",
-    "section": "Assembly vocabulary",
-    "lead": "A dollar sign means the value itself. A percent sign names a register. Parentheses mean memory at an address.\n\nThese are different even when the same digits appear.",
-    "example": "$8        literal 8\n%rax      value in rax\n(%rax)    value at address in rax\n8(%rax)   value 8 bytes later\n\nIf %rax = &x and x = 42:\nmovq (%rax), %rbx → rbx = 42",
-    "caption": "Parentheses read memory; without them, the register value itself is used.",
-    "notes": "Use an analogy: a register holds a street address; parentheses mean visit that street address. The example assumes x is an eight-byte value so movq is appropriate. Distinguish $8 (the number eight) from 8(%rax) (memory eight bytes past the address in rax).",
+    "title": "Precision changes with scale",
+    "section": "Floating point · spacing",
+    "lead": "The same three fraction bits give eight values within each normal exponent range.\n\nWhen the exponent increases by one, the distance between neighboring values doubles.",
+    "example": "E = 3 (e = 0)\nF = 0 → 1       F = 1 → 9/8\nstep = 1/8\n\nE = 4 (e = 1)\nF = 0 → 2       F = 1 → 9/4\nstep = 1/4",
+    "caption": "This is why large floating point values have larger gaps.",
+    "notes": "For normals with fixed E, incrementing F by one changes the value by 2^(E−bias)/8. Show how this connects to the rounding slide and lecture 6’s discussion of gaps between floats.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
   {
-    "title": "Trace two instructions",
-    "section": "Try it · 1 minute",
-    "lead": "Start with %rax = 100 and %rbx = 7.\n\nWhat is in each register after these lines?\n\nWhich register changed on each line?",
-    "example": "movq %rbx, %rax\naddq $3, %rax\n\n%rax = ?\n%rbx = ?",
-    "caption": "Read each line left to right: source, then destination.",
-    "notes": "Pause before showing the answer. Have students narrate the two changes aloud. Source operands are read; the destination receives the result.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Trace answer",
-    "section": "Worked example",
-    "lead": "The first line copies 7 into %rax. The second adds 3 to that copy.\n\n%rbx never changes.",
-    "example": "Initially       rax = 100   rbx = 7\nmovq %rbx,%rax  rax =   7   rbx = 7\naddq $3,%rax   rax =  10   rbx = 7",
-    "caption": "A move copies a value; it does not erase the source.",
-    "notes": "Common confusion: students may think 'move' transfers and clears rbx. Emphasize that it copies. Then ask what subq $2, %rax would do: rax becomes 8.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Registers have different widths",
-    "section": "Lecture 6–7 · register names",
-    "lead": "%rax is 64 bits. %eax names its low 32 bits; %ax names the low 16; %al names the low 8.\n\nWriting %eax zeroes the upper 32 bits of %rax. Reading %eax does not change %rax.",
-    "example": "movq $-1, %rax\nmovl $1, %eax\n\nNow %rax = 0x0000000000000001\n\nmovq  ↔  %rax  ↔  8 bytes\nmovl  ↔  %eax  ↔  4 bytes",
-    "caption": "This zero-extension rule applies to 32-bit register destinations in x86-64.",
-    "notes": "Lecture 7 discusses register aliases and movl. Be precise: writing a 32-bit register zeroes the upper 32 bits; a movl from %eax into memory does not clear the upper half of %rax. Do not generalize this rule to 8- or 16-bit writes.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Array indexing is byte arithmetic",
-    "section": "Lecture 6–8 · addresses",
-    "lead": "Memory addresses count bytes. For an int array, element i begins 4i bytes after the start when int is 4 bytes.\n\nThe addressing form combines base + index × scale + displacement.",
-    "example": "Assume %rax = &a[0], %rcx = 3\n\n(%rax,%rcx,4)\n= memory[rax + 3×4]\n= a[3]\n\n8(%rax,%rcx,4) = a[5]",
-    "caption": "The scale is the size of an element in bytes; 8 adds two more int positions here.",
-    "notes": "Assume sizeof(int)==4 for this example; the C standard does not require int to be 4 bytes on every platform. Draw boxes at addresses base, base+4, base+8, base+12. Source: lectures 6–8.",
+    "title": "How to check an encoding",
+    "section": "Floating point · recap",
+    "lead": "Compare the value with the smallest normal. Choose the normal or subnormal equation, work out the fields, then decode them to check.\n\nIf the value is not exact, use the rounding rule given with the problem.",
+    "example": "Our practice format\n\nNormal:    (1 + F/8) × 2^(E−3)\nSubnormal: (    F/8) × 2⁻²\n\nE = 0, F = 0  →  zero\n\nDecode your bits as a final check.",
+    "caption": "A correct encoding must reproduce the intended value or its required rounded value.",
+    "notes": "Review the two mistakes most likely to occur: forgetting to add the bias for a normal exponent, and using the normal hidden 1 for a subnormal. Do not reveal the unreleased homework solution. Remind students to follow the eventual assignment’s rounding and valid-input rules.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
-  },
-  {
-    "title": "Address versus value",
-    "section": "Common assembly confusion",
-    "lead": "leaq computes an address and puts it in a register.\n\nmovq with a memory source reads the value at that address.",
-    "example": "Assume rax = 1000, memory[1008] = 42\n\nleaq 8(%rax), %rbx  → rbx = 1008\nmovq 8(%rax), %rcx  → rcx = 42",
-    "caption": "lea does not dereference memory, even though its source looks like a memory operand.",
-    "notes": "Ask: which instruction could compute &a[2], and which could load a[2]? Clarify that movq reads eight bytes here; the made-up memory value 42 is an eight-byte value for this trace. Source: lecture 8 sieve assembly and lecture 7 RIP-relative example.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "A branch is an if statement",
-    "section": "Lecture 7 · control flow",
-    "lead": "cmpq compares two operands and sets condition flags. A conditional jump reads those flags.\n\nja means unsigned “jump if above.” The target is a label elsewhere in the code.",
-    "example": "C: if (n > 1) return n;\n\ncmpq $1, %rdi\nja   .Lbig\nmovl $1, %eax\nret\n.Lbig:\nmovq %rdi, %rax\nret",
-    "caption": "Here %rdi is an unsigned 64-bit n; %rax carries the return value.",
-    "notes": "For AT&T cmpq $1, %rdi, flags describe rdi minus 1. ja is true for unsigned rdi > 1. This matches lecture 7's unsigned sequence example. Distinguish signed jg from unsigned ja when asked. In a real compiled function there may be setup/cleanup instructions.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Trace the branch",
-    "section": "Try it · 2 minutes",
-    "lead": "Use the previous snippet. Predict the return value for n = 0, 1, and 4.\n\nFor each input, decide whether ja jumps before following any other line.",
-    "example": "n = 0  → ja? ___  return ___\nn = 1  → ja? ___  return ___\nn = 4  → ja? ___  return ___\n\nHint: “above 1” is strict, not ≥ 1.",
-    "caption": "Check your answer by following only the instructions on the chosen path.",
-    "notes": "Give partners time to trace. Ask one student why n=1 does not jump. The next slide moves to calls and stack frames.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "Function calls use conventions",
-    "section": "Lecture 6–7 · registers",
-    "lead": "For ordinary integer or pointer arguments on the x86-64 System V ABI, the first arguments use %rdi, %rsi, %rdx, %rcx, %r8, %r9.\n\nThe return value usually arrives in %rax.",
-    "example": "long double_it(long x) {\n    return 2 * x;\n}\n\nAt call:   %rdi = x\n           call double_it\nOn return: %rax = 2 * x",
-    "caption": "This convention applies to the Linux x86-64 examples in the lectures; floating point arguments use different registers.",
-    "notes": "Make clear this is an ABI convention, not an inherent meaning of the registers. The call instruction also saves a return address. Source: lectures 6 and 7.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_07/#/",
-    "sourceLabel": "Lecture 7"
-  },
-  {
-    "title": "The stack keeps each call’s state",
-    "section": "Lecture 7–8 · stack frames",
-    "lead": "The stack grows toward lower addresses. %rsp points at its current top.\n\nA function may save the old %rbp, set a new frame base, and subtract from %rsp to reserve space for local data.",
-    "example": "pushq %rbp        save old frame\nmovq %rsp, %rbp   set frame base\nsubq $16, %rsp   reserve 16 bytes\n...\nleave             restore old frame\nret               return to caller",
-    "caption": "These are common unoptimized patterns, not instructions every function must contain.",
-    "notes": "Lecture 8 gives this prologue and epilogue. Correct mental model: pushq decrements rsp by 8 then writes; popq reads then increments rsp by 8. call pushes the return address, ret pops it. Optimized code may omit rbp or use different frame layouts.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "A stack frame in addresses",
-    "section": "Worked example",
-    "lead": "Suppose %rsp is 0x1000 just after call has placed the return address on the stack.\n\nFollow the three setup instructions. Which address holds the saved %rbp? Where does the new frame begin?",
-    "example": "Start             rsp = 0x1000\npushq %rbp        rsp = 0x0ff8\nmovq %rsp,%rbp    rbp = 0x0ff8\nsubq $16,%rsp     rsp = 0x0fe8\n\nSaved rbp: [0x0ff8]\nReturn address: [0x1000]",
-    "caption": "Local stack space is at addresses below the new %rbp.",
-    "notes": "Walk down by eight bytes for pushq, then by sixteen for local space. The address notation here is conceptual, not a literal disassembly. The return address was pushed by call before the stated starting point.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "Arrays and sizeof",
-    "section": "Lecture 8 · C meets memory",
-    "lead": "An array stores elements in consecutive memory. In its own scope, sizeof array measures its total bytes.\n\nA function parameter written as int a[] is treated as a pointer, so sizeof a there measures the pointer.",
-    "example": "int a[5];\nsizeof a / sizeof a[0]  → 5\n\nvoid f(int a[], int length) {\n    // use length for bounds\n}",
-    "caption": "For a VLA, sizeof can be evaluated at run time. In a parameter, it still describes a pointer.",
-    "notes": "Lecture 8 covers known-size arrays, VLAs, and array parameters. Avoid claiming sizeof(pointer) always equals 8: that is platform dependent. A parameter written int a[10] is also adjusted to a pointer; the 10 does not enforce array length for a function argument.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "Variable length arrays and lifetime",
-    "section": "Lecture 8 · memory ownership",
-    "lead": "A VLA gets its length at run time. Its elements need explicit initialization.\n\nLocal array storage ends when its scope ends, so returning a pointer to that array leaves a dangling pointer.",
-    "example": "int n = get_count();\nif (n <= 0) return;\nint a[n];\nfor (int i = 0; i < n; ++i) a[i] = 0;\n\n// a is valid only in this scope",
-    "caption": "For data that must survive a function return, use an appropriate allocation and ownership plan.",
-    "notes": "Source: lecture 8. The exact maximum safe VLA size depends on available stack space. C language support for VLAs depends on the chosen C version and compiler; use course tooling for live examples. A local array's storage duration, rather than whether its bytes are immediately overwritten, determines pointer validity.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "One final trace",
-    "section": "Board practice · 3 minutes",
-    "lead": "Assume int is 4 bytes, %rax holds &a[0], and %rcx = 2.\n\nWhat address does leaq compute? What value does movl read?",
-    "example": "a = {10, 20, 30, 40}\n%rax = 0x2000\n\nleaq (%rax,%rcx,4), %rdx\nmovl (%rdx), %eax\n\n%rdx = ?\n%eax = ?",
-    "caption": "Sketch four boxes, each four bytes wide, before calculating.",
-    "notes": "Expected: rdx = 0x2008 and eax = 30. The address is base + 2*4. Have students explain why leaq does not put 30 in rdx.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
-  },
-  {
-    "title": "Trace answer and checklist",
-    "section": "Wrap-up",
-    "lead": "leaq computes 0x2000 + 2×4 = 0x2008. movl reads the 4-byte int at that address: 30.\n\nWhen assembly feels dense, mark the operand type, track the changed register, then follow the next instruction.",
-    "example": "%rdx = 0x2008   address of a[2]\n%eax = 30       value of a[2]\n\n$        literal\n%        register\n(...)    memory\nq/l      8/4 bytes",
-    "caption": "Read the relevant C beside the assembly, then verify one step at a time.",
-    "notes": "Close by pointing students to lectures 6–8 for the larger examples. Suggest compiling a very small C function with gcc -O0 -S and finding its arguments, arithmetic, and return value; compiler output may vary.",
-    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_08/#/",
-    "sourceLabel": "Lecture 8"
   }
 ]

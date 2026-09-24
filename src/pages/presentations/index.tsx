@@ -61,12 +61,12 @@ export default function Presentations() {
             <p className={styles.eyebrow}>Recitation 03</p>
             <h3>
               <Link href="/presentations/cs211-recitation-03">
-                Floating point and assembly
+                Floating point numbers
               </Link>
             </h3>
             <p>
-              Build normal and subnormal values in a small floating point
-              format, then trace x86-64 assembly and memory.
+              Build and decode normal and subnormal values in a small floating
+              point format, with practice and worked answers.
             </p>
             <div className={styles.resourceLinks}>
               <Link href="/presentations/cs211-recitation-03">

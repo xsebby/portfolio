@@ -130,10 +130,10 @@ export default function Recitation03() {
   return (
     <div ref={root} className={`${styles.viewer} ${styles.recitationThree}`}>
       <Head>
-        <title>Floating point and assembly · CS 211 · sebby</title>
+        <title>Floating point numbers · CS 211 · sebby</title>
         <meta
           name="description"
-          content="CS 211 recitation 03: worked floating point examples, x86-64 assembly, stack frames, and arrays from lectures 6–8."
+          content="CS 211 recitation 03: binary fractions, exponent bias, normal and subnormal values, rounding, and worked examples."
         />
         <link
           rel="canonical"
