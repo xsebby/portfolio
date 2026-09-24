@@ -234,6 +234,34 @@
   max-width: none;
   font-size: clamp(42px, 5vw, 64px);
 }
+.recitationThree .stage {
+  min-height: 0;
+  padding: 16px 32px;
+}
+.recitationThree .slide {
+  padding: 20px 24px;
+}
+.recitationThree .slide h1 {
+  font-size: clamp(30px, 3.4vw, 48px);
+  margin-bottom: 32px;
+}
+.recitationThree .cover h1 {
+  font-size: clamp(42px, 5vw, 64px);
+}
+.recitationThree .slideLead {
+  font-size: clamp(18px, 1.8vw, 24px);
+  line-height: 1.45;
+}
+.recitationThree .slideLead p + p {
+  margin-top: 18px;
+}
+.recitationThree .example {
+  font-size: clamp(13px, 1.5vw, 21px);
+  line-height: 1.55;
+}
+.recitationThree .caption {
+  margin-top: 30px;
+}
 .controls {
   justify-content: space-between;
   padding: 18px 32px;
@@ -356,6 +384,12 @@
   padding: 8px 32px;
 }
 @media (max-width: 760px) {
+  .recitationThree .stage {
+    padding: 16px 20px;
+  }
+  .recitationThree .slide {
+    padding: 24px 0;
+  }
   .hub {
     padding: 24px;
   }

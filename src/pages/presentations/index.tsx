@@ -61,12 +61,12 @@ export default function Presentations() {
             <p className={styles.eyebrow}>Recitation 03</p>
             <h3>
               <Link href="/presentations/cs211-recitation-03">
-                Reading assembly without panic
+                Floating point and assembly
               </Link>
             </h3>
             <p>
-              Worked examples for x86-64 operands, branches, stack frames, and
-              arrays from lectures 6–8.
+              Build normal and subnormal values in a small floating point
+              format, then trace x86-64 assembly and memory.
             </p>
             <div className={styles.resourceLinks}>
               <Link href="/presentations/cs211-recitation-03">
