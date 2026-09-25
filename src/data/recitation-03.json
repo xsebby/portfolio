@@ -3,9 +3,9 @@
     "title": "Floating point numbers",
     "section": "CS 211 · Recitation 03",
     "lead": "Build and decode numbers in a small floating point format. We will work through the bits before worrying about implementation.",
-    "example": "Today’s path\n\nBinary fractions\nExponent and significand fields\nNormal and subnormal values\nPractice with ratios and bit patterns\nHW3 preview",
+    "example": "Today’s path\n\nBinary fractions\nExponent and significand fields\nQuiz review: −1.0\nNormal and subnormal values\nPractice with ratios and bit patterns\nHW3 preview",
     "caption": "Every example uses a tiny format so every bit has a visible job.",
-    "notes": "Suggested 50-minute pacing: binary place values and fields 7 min; normal values 10 min; subnormals and the boundary 14 min; decoding and encoding practice 8 min; rounding and spacing 4 min; HW3 preview and recap 7 min. Pause after the subnormal step table and ask students to name the next value after 7/32. The HW3 details are based on the professor’s description supplied by the TA; the assignment is not officially posted. Source: lecture 6.",
+    "notes": "Suggested 50-minute pacing: binary place values and fields 7 min; normal values 10 min; quiz review 4 min; subnormals and the boundary 12 min; decoding and encoding practice 7 min; rounding and spacing 3 min; HW3 preview and recap 7 min. Pause after the quiz question before revealing the answer. The HW3 details are based on the professor’s description supplied by the TA; the assignment is not officially posted. Source: lecture 6 and the quiz screenshot supplied by the TA.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
@@ -68,6 +68,26 @@
     "notes": "Pause at each field and ask students what it means. The sign is zero. E=2 lies in the normal range, e=-1, and F=5. The value is 0.8125.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "Quiz review: −1.0 in 8 bits",
+    "section": "Floating point · quiz review",
+    "lead": "An 8-bit format has 1 sign bit, 5 exponent bits, 2 stored significand bits, and bias 15. An exponent field of 11111₂ is reserved for infinity and NaN. What representable value is closest to −1.0?",
+    "example": "Write each answer in decimal:\n\nvalue = ?\nsign = ?\nexponent = ?\nsignificand = ?",
+    "caption": "Work out the fields before revealing the answer.",
+    "notes": "This is adapted from the quiz screenshot supplied by the TA. Give students one or two minutes. The question asks for the closest representable value and the decimal values of the sign, exponent, and significand fields. It is an exact case, so no rounding is needed. Keep the answer hidden until the next slide. The quiz calls the two stored fraction bits significand bits.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6 background"
+  },
+  {
+    "title": "Quiz answer: −1.0 is exact",
+    "section": "Floating point · worked answer",
+    "lead": "−1.0 is representable exactly. Its magnitude is 1.00₂ × 2⁰, so the sign is 1, the true exponent is 0, and the stored fraction is 00₂. Add bias 15 to encode the exponent field.",
+    "example": "value = −1.0\nsign = 1\nexponent = 15\nsignificand = 0\n\nBits: 1 | 01111 | 00\n\nCheck: −(1 + 0/4) × 2^(15−15) = −1",
+    "caption": "E = 15 is valid; all five exponent bits set would be E = 31.",
+    "notes": "Quiz screenshot supplied by the TA. Decode the fields aloud: sign bit 1 makes the value negative; 01111₂ is 15, so true exponent 15−15=0; 00₂ is stored significand field 0, with implied leading 1 for a normal value. Thus (−1)^1 × (1+0/4) × 2^0=−1.0. The reserved all-ones exponent is 11111₂=31, not 01111₂=15. Explicitly tell students that an exact target is its own closest representable value.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6 background"
   },
   {
     "title": "The smallest normal is 1/4",
