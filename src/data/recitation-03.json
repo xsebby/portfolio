@@ -3,7 +3,7 @@
     "title": "Floating point numbers",
     "section": "CS 211 · Recitation 03",
     "lead": "Build and decode numbers in a small floating point format. We will work through the bits before worrying about implementation.",
-    "example": "Today’s path\n\nBinary fractions\nFirner’s value equations\nNormal values and quiz review\nGeneral subnormal threshold\nPractice and HW3 preview",
+    "example": "Today’s path\n\nBinary fractions\nNormal values and quiz review\nGeneral subnormal threshold\nPractice and HW3 preview",
     "caption": "Every example uses a tiny format so every bit has a visible job.",
     "notes": "Suggested 50-minute pacing: binary place values and fields 6 min; Firner equations and normal values 9 min; quiz review 4 min; general threshold and subnormal examples 14 min; decoding and encoding practice 6 min; rounding and spacing 3 min; HW3 preview and recap 8 min. Pause after the quiz question before revealing the answer. The HW3 details are based on the professor’s description supplied by the TA; the assignment is not officially posted. Sources: lecture 6 equation slide and the quiz screenshot supplied by the TA.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
