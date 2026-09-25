@@ -133,7 +133,7 @@ export default function Recitation03() {
         <title>Floating point numbers · CS 211 · sebby</title>
         <meta
           name="description"
-          content="CS 211 recitation 03: binary fractions, exponent bias, normal and subnormal values, rounding, and worked examples."
+          content="CS 211 recitation 03: floating point fields, normal and subnormal values, worked examples, and an HW3 preview."
         />
         <link
           rel="canonical"

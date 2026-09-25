@@ -66,7 +66,7 @@ export default function Presentations() {
             </h3>
             <p>
               Build and decode normal and subnormal values in a small floating
-              point format, with practice and worked answers.
+              point format, with practice, worked answers, and an HW3 preview.
             </p>
             <div className={styles.resourceLinks}>
               <Link href="/presentations/cs211-recitation-03">

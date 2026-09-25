@@ -3,9 +3,9 @@
     "title": "Floating point numbers",
     "section": "CS 211 · Recitation 03",
     "lead": "Build and decode numbers in a small floating point format. We will work through the bits before worrying about implementation.",
-    "example": "Today’s path\n\nBinary fractions\nExponent and significand fields\nNormal and subnormal values\nPractice with ratios and bit patterns",
+    "example": "Today’s path\n\nBinary fractions\nExponent and significand fields\nNormal and subnormal values\nPractice with ratios and bit patterns\nHW3 preview",
     "caption": "Every example uses a tiny format so every bit has a visible job.",
-    "notes": "Suggested 50-minute pacing: binary place values and fields 8 min; normal values 12 min; subnormals and the boundary 12 min; decoding and encoding practice 12 min; rounding and recap 6 min. This teaches the concepts behind the professor’s planned assignment without displaying its unreleased prompt or solution. Source: lecture 6 and the professor’s description supplied by the TA.",
+    "notes": "Suggested 50-minute pacing: binary place values and fields 7 min; normal values 10 min; subnormals and the boundary 10 min; decoding and encoding practice 10 min; rounding and spacing 5 min; HW3 preview and recap 8 min. The HW3 details are based on the professor’s description supplied by the TA; the assignment is not officially posted. Source: lecture 6.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
@@ -156,6 +156,34 @@
     "example": "E = 3 (e = 0)\nF = 0 → 1       F = 1 → 9/8\nstep = 1/8\n\nE = 4 (e = 1)\nF = 0 → 2       F = 1 → 9/4\nstep = 1/4",
     "caption": "This is why large floating point values have larger gaps.",
     "notes": "For normals with fixed E, incrementing F by one changes the value by 2^(E−bias)/8. Show how this connects to the rounding slide and lecture 6’s discussion of gaps between floats.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "HW3 preview: five inputs",
+    "section": "Floating point · assignment preview",
+    "lead": "The professor plans a program that reads a format and a nonnegative ratio. The assignment has not been posted, so treat these details as a preview.",
+    "example": "format:  exp_bits = 3\n         bias = 3\n         sig_bits = 3\n\nvalue:   numerator = 5\n         denominator = 2\n\nFind: E (exponent), F (fraction)",
+    "caption": "The first three inputs define the format; the last two define the value.",
+    "notes": "Based on the professor’s preview supplied by the TA. The intended command-line inputs are exponent bits, bias, significand bits, numerator, and denominator, in that order. The output contains the exponent and significand field values. Use 5/2 as a new teaching example. The final handout may add input and rounding details."
+  },
+  {
+    "title": "HW3 preview: encode 5/2",
+    "section": "Floating point · worked input",
+    "lead": "With 3 exponent bits, bias 3, and 3 fraction bits, write 5/2 as 1.010₂ × 2¹. The true exponent is 1, so E = 1 + 3 = 4. The stored fraction is 010₂, so F = 2.",
+    "example": "Inputs: 3 3 3 5 2\n\nE = 4 = 100₂\nF = 2 = 010₂\n\nOutput: 4 2\n\nCheck: (1 + 2/8) × 2¹ = 5/2",
+    "caption": "Move the binary point before taking the stored fraction bits.",
+    "notes": "This example is mathematically exact and uses the planned input order. Important TA note: the supplied draft solution computes the normal significand as (numerator << sig_bits)/denominator − 2^sig_bits without scaling by 2^power_of_two. For these inputs that draft gives F=12, outside the three-bit range, rather than F=2. Do not present that draft code as a correct answer key until the normal path is fixed. Source: professor’s preview and lecture 6 normal-value equation.",
+    "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
+    "sourceLabel": "Lecture 6"
+  },
+  {
+    "title": "HW3 preview: choose the equation",
+    "section": "Floating point · method",
+    "lead": "For a nonzero ratio, compare its value with the smallest normal, 2^(1−bias). That tells you which equation to use. Solve for E and F, then decode them to check.",
+    "example": "Normal (E > 0):\nvalue = (1 + F/2^p) × 2^(E−bias)\n\nSubnormal (E = 0):\nvalue = (F/2^p) × 2^(1−bias)\n\nIf numerator = 0: E = 0, F = 0",
+    "caption": "Use the supplied p and bias, not the values from our practice format.",
+    "notes": "Here p is the number of significand bits. For exact examples, solve the equation algebraically. The eventual homework may specify how to round values that fall between encodings, so do not assume a rounding rule yet. This is a conceptual approach, not a copy of the unreleased source code. Source: professor’s preview and lecture 6 equations.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
