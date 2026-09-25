@@ -24,8 +24,8 @@
     "section": "Floating point · place values",
     "lead": "Digits after a binary point are worth 1/2, 1/4, 1/8, and so on. A zero means that place contributes nothing.\n\nAdd the places marked 1 to find the value.",
     "example": "0.101₂\n\n1 × 1/2 = 1/2\n0 × 1/4 = 0\n1 × 1/8 = 1/8\n\nTotal = 5/8",
-    "caption": "Ask students to read 0.011₂ aloud as 1/4 + 1/8 = 3/8.",
-    "notes": "Draw place-value columns before introducing exponent fields. This bridges base-2 arithmetic to the 5/4 and 3/16 examples. The 0.101₂ example equals 0.625.",
+    "caption": "Your turn: What fraction is 0.011₂? Show the place values you used.",
+    "notes": "Draw place-value columns before introducing exponent fields. This bridges base-2 arithmetic to the 5/4 and 3/16 examples. The worked 0.101₂ example equals 5/8. Pause for students to solve 0.011₂; the answer is 1/4 + 1/8 = 3/8.",
     "source": "https://firner.com/presentations/cs211/2026-Fall/cs211_06/#/",
     "sourceLabel": "Lecture 6"
   },
