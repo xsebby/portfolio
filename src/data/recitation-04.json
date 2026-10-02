@@ -80,14 +80,6 @@
     "notes": "Connect the formula to assembly displacement(base,index,scale): address = displacement + base + index times scale. For long elements of 8 bytes, (%rbx,%rsi,8) with rsi = 2 selects the third element, 16 bytes from the base. Most program data lives in memory. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_08/"
   },
   {
-    "title": "Variable-length arrays",
-    "section": "Arrays",
-    "lead": "A VLA’s size is known only at runtime. The compiler must compute how many bytes the current function needs.\n\nFor a row-major 2D array, the column count determines the row stride.",
-    "example": "void f(size_t rows, size_t cols,\n       int a[rows][cols]);\n\naddress(a[i][j])\n= base + (i × cols + j) × sizeof(int)",
-    "caption": "rows limits valid values of i; cols determines the row stride used in the address.",
-    "notes": "Contrast int a[10], whose size is known at compile time, with int a[n], whose size is known only when execution reaches the declaration. In the address formula, rows does not appear because the address of a specific element depends on how many complete rows come before it, and each row contains cols elements. rows still matters as the bound: 0 <= i < rows. A VLA has automatic lifetime and is commonly allocated in the current stack frame."
-  },
-  {
     "title": "A stack frame",
     "section": "The stack",
     "lead": "Each function call gets a frame for its local work. On x86-64, the stack grows toward lower addresses.\n\n%rsp marks the top of the stack. %rbp may provide a stable frame reference.",
