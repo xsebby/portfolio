@@ -49,7 +49,7 @@ export default function Presentations() {
               <Link href="/presentations/cs211-recitation-01#demo">
                 Try the rotation demo
               </Link>
-              <a href="/presentations/cs211-recitation-01.pptx" download>
+              <a href="/presentations/CS211_Recitation_1.pptx" download>
                 Download PowerPoint
               </a>
             </div>
@@ -73,6 +73,32 @@ export default function Presentations() {
                 Open slides <span aria-hidden="true">↗</span>
               </Link>
               <a href="/presentations/CS211_Recitation_3.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>04</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 04</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-04">
+                Quiz 2 review
+              </Link>
+            </h3>
+            <p>
+              A compact review of floating point, x86-64 assembly, memory,
+              arrays, the stack, and the heap, with binary and hex conversion.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-04">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <Link href="/presentations/cs211-recitation-04#demo">
+                Try the base converter
+              </Link>
+              <a href="/presentations/CS211_Recitation_4.pptx" download>
                 Download PowerPoint
               </a>
             </div>

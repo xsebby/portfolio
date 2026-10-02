@@ -1,0 +1,130 @@
+[
+  {
+    "title": "Quiz 2 review",
+    "section": "CS 211 · Recitation 04",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "Floating point\nAssembly · memory\nStack · heap",
+    "caption": "",
+    "notes": "A compact review of Lectures 5 through 9. Start by asking which topic feels least comfortable so the worked examples can be paced around the room."
+  },
+  {
+    "title": "Binary and hex",
+    "section": "Base conversion",
+    "lead": "One hex digit represents exactly four bits.\n\nBinary → hex: group from the right in sets of four. Pad the left group with zeros.\n\nHex → binary: replace each digit with four bits.",
+    "example": "1101 0110₂\n  D    6₁₆\n\n0xFF\n1111 1111₂\n\nA = 1010   F = 1111",
+    "caption": "Learn the 4-bit patterns for 0–F; do not convert through decimal unless you need a check.",
+    "notes": "Draw vertical bars every four bits from the right. Work one nibble at a time. Quick checks: the final binary bit tells whether the hex value is odd; each hex digit must expand to exactly four bits."
+  },
+  {
+    "title": "Floating-point layout",
+    "section": "Floating Point Values",
+    "lead": "A floating-point value has three fields:\n\nsign · exponent · significand\n\nFor normalized values, subtract the bias from the stored exponent and restore the implied leading 1.",
+    "example": "value = (−1)ˢ × 2ᴱ⁻ᵇⁱᵃˢ × (1.f)\n\nFP32\n1 sign bit\n8 exponent bits\n23 fraction bits",
+    "caption": "Exponent bits all 0 or all 1 mark special cases; use the equation that matches the case.",
+    "notes": "The course calls the fraction field the significand or mantissa. For FP32, the bias is 127. All-zero exponent gives zero or subnormal values. All-one exponent gives infinity or NaN. The quiz should provide any nonstandard field widths and bias. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/"
+  },
+  {
+    "title": "Range, precision, and hardware",
+    "section": "Floating point",
+    "lead": "A finite set of bit patterns represents a finite set of values. Arithmetic may need rounding.\n\nLarger exponents cover a wider range, with larger gaps between neighboring values.",
+    "example": "Integer operations → ALU\nFloating-point operations → FPU\n\nHardware can overlap work.\nSpeed depends on the operation\nand the processor.",
+    "caption": "A floating-point operation is not automatically slower than its integer counterpart.",
+    "notes": "Explain precision with marks on a number line: floating-point spacing gets larger as magnitude increases. Many decimal fractions cannot be represented exactly in binary. Modern processors have dedicated floating-point hardware; simple integer and float operations can have comparable latency. Avoid promising equal speed for all operations."
+  },
+  {
+    "title": "Decode a small float",
+    "section": "Worked example",
+    "lead": "Format: 1 sign bit, 3 exponent bits, 4 fraction bits. Bias = 3.\n\nDecode 0 101 0110.\n\nThe exponent is 5 − 3 = 2. The significand is 1.0110₂.",
+    "example": "1.0110₂ = 1 + 1/4 + 1/8\n         = 1.375\n\n(+1) × 2² × 1.375\n= 5.5",
+    "caption": "Read the fields first. Then substitute; do not treat the whole bit string as one integer.",
+    "notes": "Circle the three fields in different colors. The sign bit is 0, so the value is positive. Exponent bits 101 are 5. Fraction bits 0110 contribute 0/2 + 1/4 + 1/8 + 0/16."
+  },
+  {
+    "title": "Build a small float",
+    "section": "Worked example",
+    "lead": "Use 1 sign bit, 3 exponent bits, 4 fraction bits, and bias 3.\n\nEncode −6.5.\n\n6.5 = 110.1₂ = 1.101₂ × 2²",
+    "example": "Sign:       1\nExponent:   2 + 3 = 5 → 101\nFraction:   1010₂ → 10\n\nFields:     1 | 101 | 1010\nDecimal:    1 |  5  |  10",
+    "caption": "Store the biased exponent and fraction bits; the leading 1 is implied.",
+    "notes": "This is the reverse of decoding. Convert the magnitude to binary, normalize to 1.f times a power of two, add bias to the exponent, and fill the fraction field. Distinguish the whole represented value from each field's decimal integer value. If a fraction needs more bits than available, apply rounding; this example is exactly representable."
+  },
+  {
+    "title": "From C to an executable",
+    "section": "Program representations",
+    "lead": "The same program appears in several forms. Each tool translates or combines one form into the next.\n\nThe instruction set architecture defines the instructions, registers, and programmer-visible behavior of the CPU.",
+    "example": "C source\n   ↓ compiler\nassembly\n   ↓ assembler\nobject file\n   ↓ linker + libraries\nexecutable",
+    "caption": "An opcode identifies an instruction in machine code; operands identify its data.",
+    "notes": "gcc -S produces assembly. objdump can disassemble machine code. The course uses x86-64. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_06/"
+  },
+  {
+    "title": "Registers and operand sizes",
+    "section": "CPU storage",
+    "lead": "Registers are a small set of very fast storage locations inside the CPU. They can be sources or destinations.\n\nThe stack lives in memory. Registers can hold addresses into it, or copies of its data.",
+    "example": "One general-purpose register:\n%rax  64 bits     %eax  32 bits\n%ax   16 bits     %al    8 bits\n\nSuffix:  b    w    l    q\nBits:    8   16   32   64\n\nmovw $9, %dx   # 16-bit operand",
+    "caption": "Register names and instruction suffixes tell you which portion of a register is used.",
+    "notes": "General-purpose registers on x86-64 are 64 bits wide, with names for smaller portions. Registers are limited storage, not megabytes of memory and not part of the stack. Explain that a 32-bit register write also clears the upper 32 bits of its 64-bit parent on x86-64, even though the instruction operand width is 32 bits."
+  },
+  {
+    "title": "Read AT&T assembly",
+    "section": "Assembly instructions",
+    "lead": "AT&T syntax puts the source first and destination second.\n\n$ means an immediate constant.\n% names a register.\nParentheses dereference an address.",
+    "example": "movq $7, %rax       rax = 7\nmovq %rax, %rdi     rdi = rax\nmovq (%rbx), %rdi   rdi = memory[rbx]\n\n−16(%rbp)          memory[rbp − 16]\n(%rbx,%rsi,8)      memory[rbx + 8·rsi]",
+    "caption": "With mov, parentheses mean access the data at the computed address.",
+    "notes": "The course and gcc/objdump default to AT&T syntax. Ask students to point to the source and destination before describing an instruction. Immediate means a literal constant, marked with $. A displacement is added to the base register before memory is accessed; it is not itself the loaded value. For example, if rbp is 0x2000 and eight bytes at 0x1FF0 represent 37, movq -16(%rbp), %rax loads 37. The effective-address calculation also appears in lea, but lea computes an address without loading memory. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_07/"
+  },
+  {
+    "title": "Trace the control flow",
+    "section": "Assembly instructions",
+    "lead": "Arithmetic changes data. cmp/test set condition flags. A conditional jump reads those flags.\n\ncall saves where execution should return. ret restores that location.",
+    "example": "# Return max(x, 0); x is in %rdi\nmovq %rdi, %rax\ncmpq $0, %rdi\njge  .done\nmovq $0, %rax\n.done:\nret",
+    "caption": "Trace register and memory values one instruction at a time; follow the jump that is actually taken.",
+    "notes": "A complete leaf-function body under the System V AMD64 convention: input in rdi, return value in rax. First copy x to rax. cmpq $0, %rdi sets flags as if computing rdi - 0 but preserves rdi. jge uses signed comparison: if x >= 0, skip the zero assignment. Otherwise replace rax with 0. Both paths reach ret. Trace x = 12 and x = -4. call elsewhere saves the next instruction's address on the stack; ret retrieves it."
+  },
+  {
+    "title": "Memory and arrays",
+    "section": "Memory",
+    "lead": "Memory is a flat sequence of byte addresses. An array stores equal-size elements contiguously.\n\nTo reach element i, scale the index by the element size.",
+    "example": "address(a[i])\n= base + i × sizeof(element)\n\nint a[10];\naddress(a[3]) = base + 3 × 4\n              = base + 12",
+    "caption": "Indices start at 0: index 2 selects the third element. C pointer arithmetic scales by element size.",
+    "notes": "Connect the formula to assembly displacement(base,index,scale): address = displacement + base + index times scale. For long elements of 8 bytes, (%rbx,%rsi,8) with rsi = 2 selects the third element, 16 bytes from the base. Most program data lives in memory. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_08/"
+  },
+  {
+    "title": "Variable-length arrays",
+    "section": "Arrays",
+    "lead": "A VLA’s size is known only at runtime. The compiler must compute how many bytes the current function needs.\n\nFor a row-major 2D array, the column count determines the row stride.",
+    "example": "void f(size_t rows, size_t cols,\n       int a[rows][cols]);\n\naddress(a[i][j])\n= base + (i × cols + j) × sizeof(int)",
+    "caption": "rows limits valid values of i; cols determines the row stride used in the address.",
+    "notes": "Contrast int a[10], whose size is known at compile time, with int a[n], whose size is known only when execution reaches the declaration. In the address formula, rows does not appear because the address of a specific element depends on how many complete rows come before it, and each row contains cols elements. rows still matters as the bound: 0 <= i < rows. A VLA has automatic lifetime and is commonly allocated in the current stack frame."
+  },
+  {
+    "title": "A stack frame",
+    "section": "The stack",
+    "lead": "Each function call gets a frame for its local work. On x86-64, the stack grows toward lower addresses.\n\n%rsp marks the top of the stack. %rbp may provide a stable frame reference.",
+    "example": "pushq %rbp\nmovq  %rsp, %rbp\nsubq  $24, %rsp   # reserve space\n   ...\nmovq  %rbp, %rsp  # discard locals\npopq  %rbp        # restore caller frame\nret",
+    "caption": "leave performs movq %rbp, %rsp followed by popq %rbp. Check which register is the destination.",
+    "notes": "call places the return address on the stack. push decrements rsp before storing; pop loads then increments it. Subtracting 24 increases the distance between rbp and rsp by 24 bytes. To release the local storage, restore rsp from rbp, then restore the caller's saved rbp. This example has no nested call; calls may require additional stack alignment. Optimized code may omit rbp as a frame pointer."
+  },
+  {
+    "title": "Stack or heap?",
+    "section": "The heap",
+    "lead": "Stack: automatic lifetime, tied to a function call.\n\nHeap: requested at runtime and remains allocated until free.\n\nA pointer may live on the stack while the memory it points to lives on the heap.",
+    "example": "int local[10];          // stack\n\nint *data = malloc(n * sizeof *data);\nif (data == NULL) { /* handle failure */ }\n\nfree(data);\ndata = NULL;",
+    "caption": "Losing the last pointer before free causes a leak; using memory after free is invalid.",
+    "notes": "Use the closet analogy carefully: the stack is a nested pile of function frames; the heap is a pool where the program requests blocks and must return them. malloc returns uninitialized storage or NULL. free only the allocation’s original address, exactly once."
+  },
+  {
+    "title": "Quick check",
+    "section": "Quiz practice",
+    "lead": "1. Convert 1011 0110₂ to hex.\n\n2. Convert 0x4D to binary.\n\n3. In movq $8, %rax, which operand is the destination?",
+    "example": "4. If an int array begins at 0x1000, where is a[5]?\n\n5. Which storage must be released with free?\n\n6. Mini-float 0 100 1000\n   Bias 3\n   What value is it?",
+    "caption": "Answer each by showing the representation or address calculation.",
+    "notes": "Give students two minutes before moving to the answers. For question 4, assume sizeof(int) is 4 bytes. For question 6, the format is 1 sign bit, 3 exponent bits, 4 fraction bits and the value is normalized."
+  },
+  {
+    "title": "Quick check answers",
+    "section": "Quiz practice",
+    "lead": "1. 0xB6\n\n2. 0100 1101₂\n\n3. %rax",
+    "example": "4. 0x1000 + 5 × 4 = 0x1014\n\n5. Heap storage from malloc/calloc/realloc\n\n6. (+1) × 2¹ × 1.5 = 3.0",
+    "caption": "Use the field widths, operand order, and address formula as your checks.",
+    "notes": "For the mini-float, exponent bits 100 are 4, so the actual exponent is 4 - 3 = 1. Fraction 1000 gives 1.5 after restoring the implied leading 1."
+  }
+]

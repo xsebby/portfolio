@@ -335,6 +335,38 @@
   border-radius: 4px;
   padding: 8px;
 }
+.converterInput {
+  width: 150px;
+  background: #18181b;
+  border: 1px solid #52525b;
+  border-radius: 4px;
+  padding: 8px;
+  color: #fafafa;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+.hexInputPrefix {
+  color: #6ee7b7;
+  margin-right: -8px;
+}
+.conversionResult {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 14px 24px;
+  align-items: baseline;
+  padding: 28px;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+}
+.conversionResult span {
+  color: #a1a1aa;
+  font-size: 13px;
+}
+.conversionResult strong {
+  color: #a7f3d0;
+  font: clamp(18px, 2.5vw, 34px) var(--font-mono);
+  overflow-wrap: anywhere;
+}
 .demoControls input[type="range"] {
   accent-color: #6ee7b7;
   width: 140px;
@@ -473,6 +505,11 @@
   .bits > * {
     font-size: 25px;
     padding: 10px 0;
+  }
+  .conversionResult {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 20px;
   }
   .bitLabels {
     font-size: 10px;
