@@ -72,14 +72,6 @@
     "notes": "The course and gcc/objdump default to AT&T syntax. Ask students to point to the source and destination before describing an instruction. Immediate means a literal constant, marked with $. A displacement is added to the base register before memory is accessed; it is not itself the loaded value. For example, if rbp is 0x2000 and eight bytes at 0x1FF0 represent 37, movq -16(%rbp), %rax loads 37. The effective-address calculation also appears in lea, but lea computes an address without loading memory. Source: https://firner.com/presentations/cs211/2026-Fall/cs211_07/"
   },
   {
-    "title": "Trace the control flow",
-    "section": "Assembly instructions",
-    "lead": "Arithmetic changes data. cmp/test set condition flags. A conditional jump reads those flags.\n\ncall saves where execution should return. ret restores that location.",
-    "example": "# Return max(x, 0); x is in %rdi\nmovq %rdi, %rax\ncmpq $0, %rdi\njge  .done\nmovq $0, %rax\n.done:\nret",
-    "caption": "Trace register and memory values one instruction at a time; follow the jump that is actually taken.",
-    "notes": "A complete leaf-function body under the System V AMD64 convention: input in rdi, return value in rax. First copy x to rax. cmpq $0, %rdi sets flags as if computing rdi - 0 but preserves rdi. jge uses signed comparison: if x >= 0, skip the zero assignment. Otherwise replace rax with 0. Both paths reach ret. Trace x = 12 and x = -4. call elsewhere saves the next instruction's address on the stack; ret retrieves it."
-  },
-  {
     "title": "Memory and arrays",
     "section": "Memory",
     "lead": "Memory is a flat sequence of byte addresses. An array stores equal-size elements contiguously.\n\nTo reach element i, scale the index by the element size.",
