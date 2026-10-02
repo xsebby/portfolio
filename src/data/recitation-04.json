@@ -82,7 +82,7 @@
   {
     "title": "A stack frame",
     "section": "The stack",
-    "lead": "Each function call gets a frame for its local work. On x86-64, the stack grows toward lower addresses.\n\n%rsp marks the top of the stack. %rbp may provide a stable frame reference.",
+    "lead": "Each function call gets a frame for its local work. On x86-64, the stack grows toward lower addresses.\n\n%rsp marks the top of the stack.",
     "example": "pushq %rbp\nmovq  %rsp, %rbp\nsubq  $24, %rsp   # reserve space\n   ...\nmovq  %rbp, %rsp  # discard locals\npopq  %rbp        # restore caller frame\nret",
     "caption": "leave performs movq %rbp, %rsp followed by popq %rbp. Check which register is the destination.",
     "notes": "call places the return address on the stack. push decrements rsp before storing; pop loads then increments it. Subtracting 24 increases the distance between rbp and rsp by 24 bytes. To release the local storage, restore rsp from rbp, then restore the caller's saved rbp. This example has no nested call; calls may require additional stack alignment. Optimized code may omit rbp as a frame pointer."
