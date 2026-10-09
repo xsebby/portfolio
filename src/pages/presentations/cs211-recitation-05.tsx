@@ -133,9 +133,6 @@ export default function Recitation05() {
       <header className={styles.toolbar}>
         <Link href="/presentations">← Presentations</Link>
         <div className={styles.viewerTools}>
-          <a href="/presentations/example.c" download>
-            Practice C file ↓
-          </a>
           <button
             type="button"
             onClick={() => {

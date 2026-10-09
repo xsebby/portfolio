@@ -5,7 +5,7 @@
     "lead": "Computer Architecture\nRutgers University",
     "example": "Opening your bomb\nReading assembly\nBreakpoints and memory inspection",
     "caption": "",
-    "notes": "Use iLab for the live demonstration. Demonstrate debugging technique using the separate example.c exercise before inspecting a bomb."
+    "notes": "Use iLab for the live demonstration. Walk through the toy loop and pointer examples before inspecting a bomb."
   },
   {
     "title": "The Bomb Lab",
@@ -38,14 +38,6 @@
     "example": "# On iLab, after downloading\ntar xvf bombN.tar\ncd bombN\nls\ncat README\ngdb ./bomb",
     "caption": "The shell runs tar and gdb. The (gdb) prompt accepts debugger commands.",
     "notes": "The TA states that download instructions will appear on the course markup; use those instructions rather than assuming a local download and scp workflow. Do not invent a wget URL. tar xvf handles a .tar archive; use the course's exact filename and archive format. These are example names. Source for the student tar archive: supplied instructor README."
-  },
-  {
-    "title": "C code and assembly",
-    "section": "Your own practice program",
-    "lead": "For C source you own, gcc -S produces an assembly file.\n\n-g adds debugger information. -O0 keeps optimization off for this exercise.\n\nThe bomb already contains machine code. Inspect that executable directly.",
-    "example": "# With the supplied example.c\ngcc -O0 -S example.c -o example.s\nless example.s\n\n# A separate executable for GDB\ngcc -g -O0 example.c -o example\ngdb ./example",
-    "caption": "Compiling bomb.c alone may fail because the phase code is missing.",
-    "notes": "Download example.c from the presentation toolbar and put it in an iLab practice directory. It defines transform(x) = 3*x + 2, called with 4. In GDB, break transform, run, print x, disassemble transform, and stepi. Its main returns success when the computed result is 14. Sources: https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html and https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html ."
   },
   {
     "title": "Assembly from the executable",
@@ -104,20 +96,20 @@
     "notes": "Use this as a method hint without associating any helper or input format with a specific phase. Inspect a format-string pointer at the relevant parsing call and inspect the return count afterward. cmp source,destination sets flags as if computing destination - source. jne follows unequal values. The spaces in a scanf-family format matter because %c alone does not skip whitespace. The format and constant here are invented for teaching and are not phase answers."
   },
   {
-    "title": "Loops and lookup tables",
+    "title": "Reading a loop",
     "section": "Patterns to recognize",
-    "lead": "For a loop, track the index and which earlier elements the code reads.\n\nFor a table, find the base address, entry size, and index bounds.\n\nA mask can reduce an input before the program uses it as an index.",
-    "example": "Loop notes\nindex    values read    value written\n\nAddress calculation\nbase + index * element_size\n\nAfter a mask\ntrack the masked index",
-    "caption": "Derive the relationship from the instructions. Familiar-looking sequences can use different rules.",
-    "notes": "Board activity: make a blank trace table and fill one iteration with the room. Look at the displacement and index expressions to distinguish dependencies on different earlier entries. Tables can contain values or code addresses, so inspect the instructions that consume each entry. General method hints only. Do not show private phase variants, constants, or recurrence sequences from the staff notes."
+    "lead": "Track the pointer, the loop counter, and the values being compared.\n\nHere, each integer takes 4 bytes. Which element does 4(%rbx) access?\n\nWhat must be true to avoid failure? What changes before the next iteration?",
+    "example": "# rdi points to four 32-bit integers\nmovq %rdi, %rbx\nmovl $1, %ecx\nloop_check:\n  movl (%rbx), %eax\n  addl $3, %eax\n  cmpl %eax, 4(%rbx)\n  jne failure\n  addq $4, %rbx\n  addl $1, %ecx\n  cmpl $4, %ecx\n  jne loop_check\n# All comparisons passed",
+    "caption": "Simplified teaching example with altered checks. Derive your own bomb's rule from its instructions.",
+    "notes": "Inspired by the loop structure in the supplied phase_2 screenshot, with different checks and no initial phase inputs. This is an excerpt rather than a complete function; any surrounding function must preserve callee-saved rbx. Board walkthrough: rbx begins at a[0], ecx is 1. eax becomes a[0] + 3; cmp compares a[1] against that value. jne goes to failure when they differ. addq $4 advances one 32-bit element, then ecx increments. The comparisons check a[1], a[2], and a[3]; ecx reaches 4 and exits. Use a toy array such as 10,13,16,19, then change the third element to illustrate the failing branch. Ask students to name the memory operands before explaining the relationship. This example is not the actual phase algorithm or a phase solution."
   },
   {
     "title": "Calls and pointer structures",
     "section": "Patterns to recognize",
-    "lead": "For recursive code, identify the stopping condition and how each call changes its arguments.\n\nFor pointer structures, distinguish a node's value from its next pointer.\n\nWrite down each address you visit before following the next link.",
-    "example": "Recursive trace\narguments    base case    return value\n\nPointer trace\nnode address    data    next address\n\nArray index and node value\nmay represent different things.",
-    "caption": "Assembly offsets reveal which field the program reads and how it uses that field.",
-    "notes": "Offer this as a broad strategy for later phases. Do not identify any private algorithm, ordering direction, tree values, or hidden-phase trigger. Inspect comparisons to infer what a value means instead of assuming an index equals the stored data. bt can show the call chain when paused in recursion."
+    "lead": "call enters a helper; ret returns to the instruction after the call.\n\nIn this example, %rdi holds a node address. The 4-byte data field is at offset 0; the next pointer is at offset 8.\n\nWhich instruction reads data? Which follows a pointer?",
+    "example": "# Caller: rdi holds the head pointer\ncall sum_nodes     # result in eax\n\n# Helper function\nsum_nodes:\n  xorl %eax, %eax\nvisit:\n  testq %rdi, %rdi\n  je done\n  addl (%rdi), %eax\n  movq 8(%rdi), %rdi\n  jmp visit\ndone:\n  ret",
+    "caption": "Toy linked-list traversal. Field offsets and checks in your bomb may differ.",
+    "notes": "This is an invented helper, not bomb phase code. Under System V AMD64, the first pointer argument is in rdi and a 32-bit integer return value is in eax. The caller line is a separate excerpt; do not fall through into the helper. A toy node layout has a 32-bit data field at offset 0, padding at offset 4, and an 8-byte next pointer at offset 8. xor clears the sum. test checks for a null pointer before dereferencing. add reads the current node's data; mov reads the stored next address into rdi. Trace two nodes containing 5 and 9, with the second next pointer null: eax returns 14. Distinguish advancing through a stored link from adding a fixed stride to an array pointer. call saves a return address; ret uses it. No recursion, private ordering rule, or phase solution is shown."
   },
   {
     "title": "Saving confirmed inputs",

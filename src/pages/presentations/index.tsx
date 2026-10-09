@@ -121,9 +121,6 @@ export default function Presentations() {
               <Link href="/presentations/cs211-recitation-05">
                 Open slides <span aria-hidden="true">↗</span>
               </Link>
-              <a href="/presentations/example.c" download>
-                Practice C file
-              </a>
               <a href="/presentations/CS211_Recitation_5.pptx" download>
                 Download PowerPoint
               </a>
