@@ -107,7 +107,7 @@
     "title": "Calls and pointer structures",
     "section": "Patterns to recognize",
     "lead": "call enters a helper; ret returns to the instruction after the call.\n\nIn this example, %rdi holds a node address. The 4-byte data field is at offset 0; the next pointer is at offset 8.\n\nWhich instruction reads data? Which follows a pointer?",
-    "example": "# Caller: rdi holds the head pointer\ncall sum_nodes     # result in eax\n\n# Helper function\nsum_nodes:\n  xorl %eax, %eax\nvisit:\n  testq %rdi, %rdi\n  je done\n  addl (%rdi), %eax\n  movq 8(%rdi), %rdi\n  jmp visit\ndone:\n  ret",
+    "example": "call sum_nodes     # result in eax\n# Helper function\nsum_nodes:\n  xorl %eax, %eax\nvisit:\n  testq %rdi, %rdi\n  je done\n  addl (%rdi), %eax\n  movq 8(%rdi), %rdi\n  jmp visit\ndone:\n  ret",
     "caption": "Toy linked-list traversal. Field offsets and checks in your bomb may differ.",
     "notes": "This is an invented helper, not bomb phase code. Under System V AMD64, the first pointer argument is in rdi and a 32-bit integer return value is in eax. The caller line is a separate excerpt; do not fall through into the helper. A toy node layout has a 32-bit data field at offset 0, padding at offset 4, and an 8-byte next pointer at offset 8. xor clears the sum. test checks for a null pointer before dereferencing. add reads the current node's data; mov reads the stored next address into rdi. Trace two nodes containing 5 and 9, with the second next pointer null: eax returns 14. Distinguish advancing through a stored link from adding a fixed stride to an array pointer. call saves a return address; ret uses it. No recursion, private ordering rule, or phase solution is shown."
   },
