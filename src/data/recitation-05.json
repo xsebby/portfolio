@@ -5,7 +5,7 @@
     "lead": "Computer Architecture\nRutgers University",
     "example": "Opening your bomb\nReading assembly\nBreakpoints and memory inspection",
     "caption": "",
-    "notes": "Use iLab for the live demonstration. Walk through the toy loop and pointer examples before inspecting a bomb."
+    "notes": "Use iLab for the live demonstration. Walk through the toy loop example before inspecting a bomb."
   },
   {
     "title": "The Bomb Lab",
@@ -102,14 +102,6 @@
     "example": "# rdi points to four 32-bit integers\nmovq %rdi, %rbx\nmovl $1, %ecx\nloop_check:\n  movl (%rbx), %eax\n  addl $3, %eax\n  cmpl %eax, 4(%rbx)\n  jne failure\n  addq $4, %rbx\n  addl $1, %ecx\n  cmpl $4, %ecx\n  jne loop_check\n# All comparisons passed",
     "caption": "Simplified teaching example with altered checks. Derive your own bomb's rule from its instructions.",
     "notes": "Inspired by the loop structure in the supplied phase_2 screenshot, with different checks and no initial phase inputs. This is an excerpt rather than a complete function; any surrounding function must preserve callee-saved rbx. Board walkthrough: rbx begins at a[0], ecx is 1. eax becomes a[0] + 3; cmp compares a[1] against that value. jne goes to failure when they differ. addq $4 advances one 32-bit element, then ecx increments. The comparisons check a[1], a[2], and a[3]; ecx reaches 4 and exits. Use a toy array such as 10,13,16,19, then change the third element to illustrate the failing branch. Ask students to name the memory operands before explaining the relationship. This example is not the actual phase algorithm or a phase solution."
-  },
-  {
-    "title": "Calls and pointer structures",
-    "section": "Patterns to recognize",
-    "lead": "call enters a helper; ret returns to the instruction after the call.\n\nIn this example, %rdi holds a node address. The 4-byte data field is at offset 0; the next pointer is at offset 8.\n\nWhich instruction reads data? Which follows a pointer?",
-    "example": "call sum_nodes     # result in eax\n# Helper function\nsum_nodes:\n  xorl %eax, %eax\nvisit:\n  testq %rdi, %rdi\n  je done\n  addl (%rdi), %eax\n  movq 8(%rdi), %rdi\n  jmp visit\ndone:\n  ret",
-    "caption": "Toy linked-list traversal. Field offsets and checks in your bomb may differ.",
-    "notes": "This is an invented helper, not bomb phase code. Under System V AMD64, the first pointer argument is in rdi and a 32-bit integer return value is in eax. The caller line is a separate excerpt; do not fall through into the helper. A toy node layout has a 32-bit data field at offset 0, padding at offset 4, and an 8-byte next pointer at offset 8. xor clears the sum. test checks for a null pointer before dereferencing. add reads the current node's data; mov reads the stored next address into rdi. Trace two nodes containing 5 and 9, with the second next pointer null: eax returns 14. Distinguish advancing through a stored link from adding a fixed stride to an array pointer. call saves a return address; ret uses it. No recursion, private ordering rule, or phase solution is shown."
   },
   {
     "title": "Saving confirmed inputs",
