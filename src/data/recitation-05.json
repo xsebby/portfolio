@@ -1,0 +1,138 @@
+[
+  {
+    "title": "Bomb Lab & GDB",
+    "section": "CS 211 · Recitation 05",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "Opening your bomb\nReading assembly\nBreakpoints and memory inspection",
+    "caption": "",
+    "notes": "Use iLab for the live demonstration. Demonstrate debugging technique using the separate example.c exercise before inspecting a bomb."
+  },
+  {
+    "title": "The Bomb Lab",
+    "section": "Overview",
+    "lead": "A binary bomb is an executable with phases that check your input.\n\nA correct line defuses a phase. An incorrect line reaches the explosion path.\n\nYour job is to infer the checks from the machine code.",
+    "example": "Read the phase\nIdentify the required input format\nFollow the conditions\nExplain a candidate input\nTest with breakpoints",
+    "caption": "Check Canvas for the deadline, scoring, and submission instructions. Explosions may be recorded.",
+    "notes": "Source: CS:APP Bomb Lab instructor README supplied by the TA, overview and solving sections. The supplied document describes multiple deployment modes, so do not announce a particular penalty or grading mechanism without the current student handout."
+  },
+  {
+    "title": "Everyone has a unique bomb",
+    "section": "Your assignment",
+    "lead": "Your bomb has its own constants and phase variants.\n\nThe recitation demo may have different strings, numbers, and addresses.\n\nUse your own disassembly to justify each input.",
+    "example": "Same tools\nDifferent executable\nDifferent checks\n\nA value from the demo may fail\nin your bomb.",
+    "caption": "",
+    "notes": "Source: supplied CS:APP instructor README, randomized phase variants and parameterized constants. The TA explicitly states that every student will receive a unique bomb. Do not display the private phase-change notes or a staff solution."
+  },
+  {
+    "title": "The student folder",
+    "section": "Files",
+    "lead": "bomb is the executable you investigate.\n\nbomb.c shows the main program and how it reads input. It may omit the phase implementations.\n\nREADME and ID identify your assigned bomb.",
+    "example": "Typical student files\n\nbomb\nbomb.c\nREADME\nID\n\nls\nless bomb.c",
+    "caption": "Your downloaded folder may differ. Keep the supplied executable intact.",
+    "notes": "Source: supplied CS:APP instructor README, student archive contents. The TA screenshot shows a staff build folder with additional files. Those extra source and solution artifacts are not part of the student workflow and are deliberately excluded. In less, use q to return to the shell."
+  },
+  {
+    "title": "Opening the bomb on iLab",
+    "section": "Terminal",
+    "lead": "Download your assigned archive using the course link. Copy it to iLab if you downloaded it locally.\n\nReplace N with your bomb number and YOUR_NETID with your NetID. Use the actual archive name.",
+    "example": "# Local terminal, in Downloads\nscp bombN.tar YOUR_NETID@ilab.cs.rutgers.edu:~/\nssh YOUR_NETID@ilab.cs.rutgers.edu\n\n# Now on iLab\ntar xvf bombN.tar\ncd bombN\nls\ncat README\ngdb ./bomb",
+    "caption": "The shell runs scp, tar, and gdb. The (gdb) prompt accepts debugger commands.",
+    "notes": "The remote path ~/ is the home directory. If the archive is already on iLab, skip scp. tar xvf handles a .tar archive; use the course's exact filename and archive format. These are example names, not a course download URL. Source for the student tar archive: supplied instructor README."
+  },
+  {
+    "title": "C code and assembly",
+    "section": "Your own practice program",
+    "lead": "For C source you own, gcc -S produces an assembly file.\n\n-g adds debugger information. -O0 keeps optimization off for this exercise.\n\nThe bomb already contains machine code. Inspect that executable directly.",
+    "example": "# With the supplied example.c\ngcc -O0 -S example.c -o example.s\nless example.s\n\n# A separate executable for GDB\ngcc -g -O0 example.c -o example\ngdb ./example",
+    "caption": "Compiling bomb.c alone may fail because the phase code is missing.",
+    "notes": "Download example.c from the presentation toolbar and put it in an iLab practice directory. It defines transform(x) = 3*x + 2, called with 4. In GDB, break transform, run, print x, disassemble transform, and stepi. Its main returns success when the computed result is 14. Sources: https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html and https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html ."
+  },
+  {
+    "title": "Assembly from the executable",
+    "section": "Static inspection",
+    "lead": "objdump displays machine instructions without running the bomb.\n\nIn GDB, disassemble displays one function.\n\nUse AT&T syntax consistently with the earlier recitations.",
+    "example": "# Shell\nobjdump -d bomb > bomb-disassembly.txt\nless bomb-disassembly.txt\n\n# Inside GDB\nset disassembly-flavor att\ninfo functions phase_\ndisassemble phase_1",
+    "caption": "Function names depend on your executable. Use the symbols it actually provides.",
+    "notes": "Sources: https://sourceware.org/binutils/docs/binutils/objdump.html and https://sourceware.org/gdb/current/onlinedocs/gdb.html/Machine-Code.html . The > operator writes objdump output to a text file. less supports /phase_1 to search and q to quit. GDB function names require available symbols. Compiler-generated .s text and disassembly can differ in formatting and addresses."
+  },
+  {
+    "title": "The first GDB session",
+    "section": "Breakpoints",
+    "lead": "Set breakpoints before running. Stop at the phase entry and inspect its instructions.\n\nA breakpoint on explode_bomb gives an extra stopping point if execution reaches it.\n\nAt that breakpoint, inspect and stop the run.",
+    "example": "(gdb) break phase_1\n(gdb) break explode_bomb\n(gdb) info breakpoints\n(gdb) run\n\n# At the phase breakpoint\n(gdb) disassemble phase_1\n(gdb) x/i $pc",
+    "caption": "A breakpoint pauses execution. Continuing from explode_bomb can execute the failure routine.",
+    "notes": "Use the actual symbol names in the assigned executable. A phase-entry breakpoint may occur after read_line has already requested input. Distinguish input typed to the running bomb from commands typed at (gdb). A breakpoint at explode_bomb is a backup, not a promise that all versions avoid reporting a failure. Do not step through or continue the explosion routine. Use kill to stop the inferior, then inspect and restart. Source: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Set-Breaks.html ."
+  },
+  {
+    "title": "Managing breakpoints",
+    "section": "GDB commands",
+    "lead": "Break at a function or at a specific instruction address.\n\nGDB assigns a number to each breakpoint. Use that number to disable or delete it.\n\nChoose addresses from your current disassembly.",
+    "example": "break phase_2\nbreak *ADDRESS\ninfo breakpoints\n\ndisable 2\nenable 2\ndelete 2\n\nhelp break",
+    "caption": "Replace ADDRESS with a real address. Breakpoint numbers may differ in your session.",
+    "notes": "Source: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Set-Breaks.html . Show one address breakpoint live using an address copied from the student's running process. Absolute addresses may change across runs under address randomization. Prefer function breakpoints when possible. explain that b, info b, and d are common abbreviations but use full commands when teaching."
+  },
+  {
+    "title": "Stepping through instructions",
+    "section": "GDB commands",
+    "lead": "si executes one machine instruction and enters calls. ni executes one instruction and steps over calls.\n\nStepping over a call still runs the function.\n\nSource commands step and next operate on source lines when debug information exists.",
+    "example": "si         # stepi\nni         # nexti\nx/i $pc    # current instruction\n\ncontinue   # run until next stop\nrun        # restart from the beginning\nkill       # stop the running program\nquit       # leave GDB",
+    "caption": "Inspect the destination of a call before using ni or continue.",
+    "notes": "Source: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Continuing-and-Stepping.html . A breakpoint or signal can interrupt stepping. finish runs until the current function returns and can also execute a failure path, so it is not a safe substitute for understanding the function. Ctrl+C pauses a running program. kill terminates the inferior while keeping GDB open. run may ask whether to restart if a program is already active."
+  },
+  {
+    "title": "Registers and memory in GDB",
+    "section": "Inspection",
+    "lead": "print shows a value. x examines memory at an address.\n\nChoose the display format to match the data: strings, integers, or pointers.\n\nIn GDB, register names begin with $. In AT&T assembly, they begin with %.",
+    "example": "info registers rax rdi rsi rsp\np/x $rax       # register in hex\np/d $rax       # register in decimal\nx/s $rdi       # string at address\nx/4dw $rsp     # four 4-byte integers\nx/2gx $rsp     # two 8-byte values\nx/5i $pc       # five instructions",
+    "caption": "Use x/s only when the register holds a readable string address.",
+    "notes": "Sources: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Memory.html and https://sourceware.org/gdb/current/onlinedocs/gdb.html/Registers.html . x/4dw: 4 units, decimal format, word units of 4 bytes. x/2gx: 2 units, 8-byte giant words, hexadecimal format. p/d displays the register as a signed integer according to its type. For parsed 32-bit results, p/d $eax can be more appropriate. On System V AMD64, integer and pointer arguments commonly begin in rdi and rsi, and integer return values use rax/eax. Only interpret arguments at the appropriate call boundary."
+  },
+  {
+    "title": "An address or its contents",
+    "section": "Assembly reminder",
+    "lead": "A register can hold a number or an address. mov copies the operand you specify.\n\nA parenthesized source operand in mov loads the contents at that address.\n\nlea computes an address without reading its contents.",
+    "example": "# Suppose rbx = 0x2000\n# memory[0x2000] contains 37\n\nmovq %rbx, %rax     # rax = 0x2000\nmovq (%rbx), %rax   # rax = 37\nleaq 8(%rbx), %rax  # rax = 0x2008\n\n# GDB checks\np/x $rbx\nx/gd $rbx",
+    "caption": "Toy values for this example. Addresses and contents in your bomb will differ.",
+    "notes": "Connect to the earlier house-address discussion: copying the address versus fetching the contents. lea is often used to form pointers to strings or stack slots before a helper call. x/gd reads an 8-byte value and formats it as signed decimal. Memory command reference: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Memory.html ."
+  },
+  {
+    "title": "Input formats and comparisons",
+    "section": "Reading a phase",
+    "lead": "Identify what the program parses before solving the checks.\n\nA parsing helper may check how many fields it read. A later comparison checks their values.\n\nRead the comparison and the branch together.",
+    "example": "# Toy input format\n\"%d %c\"     # integer, then character\n\n# Toy value check\ncmp $9, %eax\njne failure\n\nTo avoid this branch, eax must be 9.",
+    "caption": "A parsed-field count and a parsed value answer different questions.",
+    "notes": "Use this as a method hint without associating any helper or input format with a specific phase. Inspect a format-string pointer at the relevant parsing call and inspect the return count afterward. cmp source,destination sets flags as if computing destination - source. jne follows unequal values. The spaces in a scanf-family format matter because %c alone does not skip whitespace. The format and constant here are invented for teaching and are not phase answers."
+  },
+  {
+    "title": "Loops and lookup tables",
+    "section": "Patterns to recognize",
+    "lead": "For a loop, track the index and which earlier elements the code reads.\n\nFor a table, find the base address, entry size, and index bounds.\n\nA mask can reduce an input before the program uses it as an index.",
+    "example": "Loop notes\nindex    values read    value written\n\nAddress calculation\nbase + index * element_size\n\nAfter a mask\ntrack the masked index",
+    "caption": "Derive the relationship from the instructions. Familiar-looking sequences can use different rules.",
+    "notes": "Board activity: make a blank trace table and fill one iteration with the room. Look at the displacement and index expressions to distinguish dependencies on different earlier entries. Tables can contain values or code addresses, so inspect the instructions that consume each entry. General method hints only. Do not show private phase variants, constants, or recurrence sequences from the staff notes."
+  },
+  {
+    "title": "Calls and pointer structures",
+    "section": "Patterns to recognize",
+    "lead": "For recursive code, identify the stopping condition and how each call changes its arguments.\n\nFor pointer structures, distinguish a node's value from its next pointer.\n\nWrite down each address you visit before following the next link.",
+    "example": "Recursive trace\narguments    base case    return value\n\nPointer trace\nnode address    data    next address\n\nArray index and node value\nmay represent different things.",
+    "caption": "Assembly offsets reveal which field the program reads and how it uses that field.",
+    "notes": "Offer this as a broad strategy for later phases. Do not identify any private algorithm, ordering direction, tree values, or hidden-phase trigger. Inspect comparisons to infer what a value means instead of assuming an index equals the stored data. bt can show the call chain when paused in recursion."
+  },
+  {
+    "title": "Saving confirmed inputs",
+    "section": "Repeatable runs",
+    "lead": "Keep a separate text file with one confirmed phase input per line, in order.\n\nRead bomb.c to check whether your version accepts that file as a command-line argument.\n\nKeep your own notes on why each line passes.",
+    "example": "# If bomb.c supports a filename\n(gdb) run answers.txt\n\n# Otherwise, stdin redirection\n(gdb) run < answers.txt\n\n# Breakpoints remain in this session\n(gdb) info breakpoints",
+    "caption": "An argument file and stdin redirection handle end-of-file differently. Check your version before relying on either.",
+    "notes": "The standard CS:APP driver often accepts a filename and switches to interactive input when that file ends, while stdin redirection may terminate at EOF. Verify the supplied bomb.c instead of promising that behavior for every version. Do not include placeholders or guessed lines in a replay file. Source for input redirection and distinct deployment modes: supplied instructor README. GDB run syntax: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Arguments.html and https://sourceware.org/gdb/current/onlinedocs/gdb.html/Input_002fOutput.html ."
+  },
+  {
+    "title": "A phase investigation",
+    "section": "Workflow",
+    "lead": "Pause at the phase entry.\n\nIdentify the input format and failure branches.\n\nTrack the registers or memory that each check uses.\n\nTest a candidate only after you can explain it.",
+    "example": "Useful notes to keep\n\nFunction and instruction address\nInput fields\nCondition required to pass\nObserved register or memory values\nReason for the candidate input",
+    "caption": "When asking for help, bring the exact instruction and your current interpretation.",
+    "notes": "Close with a short live demonstration on the student's own assigned executable. If execution reaches the failure routine breakpoint, inspect the caller with bt and disassemble, then kill and restart after correcting the reasoning. The goal is understanding each check rather than changing registers or patching the executable to skip it."
+  }
+]

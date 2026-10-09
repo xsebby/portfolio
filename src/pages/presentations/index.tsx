@@ -104,6 +104,32 @@ export default function Presentations() {
             </div>
           </div>
         </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>05</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 05</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-05">
+                Bomb Lab &amp; GDB
+              </Link>
+            </h3>
+            <p>
+              Opening your unique bomb, inspecting assembly, and using GDB
+              breakpoints, registers, and memory commands.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-05">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="/presentations/example.c" download>
+                Practice C file
+              </a>
+              <a href="/presentations/CS211_Recitation_5.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
       </section>
       <footer className={styles.hubFooter}>
         Course deadlines and submission details live on Canvas.
