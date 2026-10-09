@@ -34,10 +34,10 @@
   {
     "title": "Opening the bomb on iLab",
     "section": "Terminal",
-    "lead": "Download your assigned archive using the course link. Copy it to iLab if you downloaded it locally.\n\nReplace N with your bomb number and YOUR_NETID with your NetID. Use the actual archive name.",
-    "example": "# Local terminal, in Downloads\nscp bombN.tar YOUR_NETID@ilab.cs.rutgers.edu:~/\nssh YOUR_NETID@ilab.cs.rutgers.edu\n\n# Now on iLab\ntar xvf bombN.tar\ncd bombN\nls\ncat README\ngdb ./bomb",
-    "caption": "The shell runs scp, tar, and gdb. The (gdb) prompt accepts debugger commands.",
-    "notes": "The remote path ~/ is the home directory. If the archive is already on iLab, skip scp. tar xvf handles a .tar archive; use the course's exact filename and archive format. These are example names, not a course download URL. Source for the student tar archive: supplied instructor README."
+    "lead": "Download instructions for your assigned bomb will be on the course markup.\n\nFollow those instructions on iLab, then extract the archive and open your bomb in GDB.\n\nReplace N with your bomb number. Use the actual archive and folder names.",
+    "example": "# On iLab, after downloading\ntar xvf bombN.tar\ncd bombN\nls\ncat README\ngdb ./bomb",
+    "caption": "The shell runs tar and gdb. The (gdb) prompt accepts debugger commands.",
+    "notes": "The TA states that download instructions will appear on the course markup; use those instructions rather than assuming a local download and scp workflow. Do not invent a wget URL. tar xvf handles a .tar archive; use the course's exact filename and archive format. These are example names. Source for the student tar archive: supplied instructor README."
   },
   {
     "title": "C code and assembly",
