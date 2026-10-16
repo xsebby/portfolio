@@ -3,7 +3,7 @@
     "title": "Quiz 3 review",
     "section": "CS 211 · Recitation 06",
     "lead": "Computer Architecture\nRutgers University",
-    "example": "Stack and heap\nStructs, unions, and alignment\nFloating-point values and registers",
+    "example": "Stack and heap\nStructs, unions, and alignment\nFloating-point values",
     "caption": "",
     "answer": "",
     "notes": "Review topics through Lecture 11, as confirmed by the This Quiz section of https://firner.com/presentations/cs211/2026-Fall/cs211_13/ . Use the questions for board work before revealing answers. Examples are original practice problems."
@@ -81,15 +81,6 @@
     "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ . Original practice values. Answer: -5.25. Common mistakes: interpreting sign 1 as positive; using exponent 129 without subtracting bias; using fraction 0.3125 without the implied 1. Verify by normalizing -101.01₂ as -1.0101₂ × 2²."
   },
   {
-    "title": "Practice: build the float bits",
-    "section": "Shifts and representation",
-    "lead": "bits begins as zero. The shifts place values into the FP32 exponent and fraction fields.\n\nInterpret the resulting 32 bits as an FP32 value. What is the decimal value?\n\nThis changes a bit pattern; it is not an integer-to-float cast.",
-    "example": "uint32_t bits = 0;\nbits |= (126u << 23);\nbits |= (1u << 22);\nbits |= (1u << 20);\n\nSign bit = 0\nStored exponent = ?\nFraction weights = ?",
-    "caption": "Fraction bit 22 has weight 1/2; bit 21 has weight 1/4; bit 20 has weight 1/8.",
-    "answer": "1. Stored exponent E = 126, so the actual exponent is 126 − 127 = −1.\n\n2. Fraction weights: bits 22 and 20 contribute 1/2 + 1/8 = 0.625. Restore the implied 1 to get a significand of 1.625.\n\n3. Decimal value = 2^(−1) × 1.625 = 0.8125. The final bit pattern is 0x3F500000.",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ (Implementation Details, Now with Significand) and https://firner.com/presentations/cs211/2026-Fall/cs211_10/ (Reinterpreting Data). Include stdint.h for uint32_t. Answer: 0.8125. To inspect the representation in ordinary C on the stated FP32 system, use float f; memcpy(&f, &bits, sizeof f); with string.h, avoiding pointer-aliasing casts. A numeric conversion (float)bits would produce a different result."
-  },
-  {
     "title": "Extra practice: encode −6.5",
     "section": "Floating point",
     "lead": "Work in the opposite direction: start with a decimal value and find its FP32 fields.\n\nConvert the magnitude to binary, normalize it, then apply the bias.\n\nWhat are the sign bit, stored exponent, and fraction bits?",
@@ -99,33 +90,6 @@
     "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ . Original additional float question requested by the TA. Write the place values 4,2,1,1/2 on the board; 6.5 uses 4 + 2 + 1/2. The leading normalized 1 is implied and is not copied into the 23-bit fraction field. Answer fields: 1 | 10000001 | 10100000000000000000000."
   },
   {
-    "title": "Zero, subnormals, infinity, and NaN",
-    "section": "Floating-point cases",
-    "lead": "Check the exponent field before using a formula.\n\nA zero exponent has no implied leading 1. Its scale uses 1 − bias.\n\nAn all-ones exponent represents infinity or NaN, depending on the fraction.",
-    "example": "Stored E    Fraction F    Meaning\n0           0             ±0\n0           nonzero       subnormal\n1–254       any           normal\n255         0             ±infinity\n255         nonzero       NaN\n\nSubnormal magnitude:\n2^(1 - 127) × F/2^23",
-    "caption": "A stored exponent of zero does not mean the whole number must be zero.",
-    "answer": "",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ (NaN and Infinity, Subnormal Numbers, Equations). The subnormal magnitude expression omits sign deliberately; multiply by (-1)^s for the signed value. For normal values the complete significand is 1.f; for subnormal values it is 0.f. Ask whether E=0,F=1 is zero: it is the smallest positive subnormal when sign=0."
-  },
-  {
-    "title": "Floating-point register families",
-    "section": "Hardware",
-    "lead": "x87 has eight 80-bit registers organized as a register stack. This is separate from the function-call stack.\n\nXMM registers are 128 bits wide. Scalar float instructions use one value within that register.\n\nYMM registers are 256 bits wide; their low 128 bits overlap XMM.",
-    "example": "x87:  ST(0) ... ST(7)   80 bits\nMMX:  mm0 ... mm7       64 bits\n      packed integers; aliases x87\nXMM:  xmm0 ... xmm15   128 bits\nYMM:  ymm0 ... ymm15   256 bits\n\nmovss / addss: scalar FP32\nmovsd / addsd: scalar FP64",
-    "caption": "The register width is not the size of every value it holds. Names here use the baseline x86-64 model.",
-    "answer": "",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Different Hardware, Space, FPU, Register Features, Moving floats). Additional reference: https://cdrdv2-public.intel.com/843820/325462-sdm-vol-1-2abcd-3abcd-4-1.pdf (basic execution environment and SSE/AVX register organization). Technical clarification: MMX mm registers are distinct from SSE xmm names; MMX is for packed integers and aliases the x87 register storage. XMM is 16 bytes, YMM is 32 bytes. Legacy scalar ss operations use the low 32-bit floating-point element; sd uses the low 64-bit element. Newer extensions may provide additional registers. Do not confuse the x87 register stack with RAM addressed by rsp."
-  },
-  {
-    "title": "Practice: scalar float instructions",
-    "section": "Assembly",
-    "lead": "Initially, the low float in %xmm0 is 2.5 and the low float in %xmm1 is 4.0.\n\nWhat value is in %xmm0 after each instruction?\n\nWhy convert to double before passing a float to printf?",
-    "example": "# AT&T: source, destination\nmulss %xmm1, %xmm0\naddss %xmm1, %xmm0\ncvtss2sd %xmm0, %xmm0\n\nss = scalar single precision\nsd = scalar double precision",
-    "caption": "For these operations, %xmm0 is the destination; %xmm1 stays unchanged.",
-    "answer": "1. Values after each instruction: mulss gives 10.0; addss gives 14.0; cvtss2sd converts that low scalar value to a double, still 14.0.\n\n2. Why convert before printf? C promotes float arguments to double for variadic functions such as printf; %f expects that promoted value.",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Moving floats, Operations, Other Operations, Passing a Float). These small values are represented exactly. Under the System V AMD64 convention, scalar float/double arguments normally use XMM registers, not the x87 stack; first such argument is normally xmm0. SS is 32-bit scalar, SD is 64-bit scalar. Avoid describing this as a conversion of the entire 128-bit register."
-  },
-  {
     "title": "Practice: exhausting the stack",
     "section": "Stack overflow",
     "lead": "Active calls keep their frames until they return. Deep recursion or large local arrays can exhaust the available stack.\n\nAssume each active frame needs 2 KiB and only 64 KiB is available. Ignore all other overhead.\n\nCan 40 active calls fit?",
@@ -133,23 +97,5 @@
     "caption": "Stack exhaustion is different from writing past the end of a stack buffer.",
     "answer": "1. Required space: 40 × 2 KiB = 80 KiB.\n\n2. Can 40 active calls fit? No. 80 KiB exceeds the 64 KiB budget; at most 32 frames fit in this simplified model. Real frames have other costs, and stack limits depend on the environment. The stack need not literally collide with the heap to overflow.",
     "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (Unwinding, Stack Overflows). An active frame cannot be reclaimed while its caller still needs its state. Optimization can eliminate frames or transform recursion, so the question explicitly assumes a fixed active-frame cost. Heap growth is a useful simplified diagram; real allocators also use independent mapped regions and are not one universally contiguous upward-growing area."
-  },
-  {
-    "title": "Practice: writing past a buffer",
-    "section": "Stack corruption",
-    "lead": "How many bytes fit in name, including the terminating null byte?\n\nIdentify the invalid write.\n\nCould it affect nearby stack data? Is a crash guaranteed?",
-    "example": "void label(void) {\n    char name[4];\n    name[0] = 'C';\n    name[1] = 'S';\n    name[2] = '2';\n    name[3] = '1';\n    name[4] = '\\0';\n}",
-    "caption": "An invalid write is undefined behavior even when the program appears to run normally.",
-    "answer": "1. Capacity: name has 4 bytes, so it holds at most 3 ordinary string characters plus a null terminator.\n\n2. Invalid write: name[4] is out of bounds; valid indices are 0–3.\n\n3. Could it affect nearby stack data? Yes. A write past a stack buffer can corrupt adjacent data or saved call state.\n\n4. Is a crash guaranteed? No. The write is undefined behavior; the exact effect is not guaranteed.",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Stack Corruption, Buffer Overflows). This is a conceptual C example; an optimizer may remove unused stores. Do not claim a particular stack layout or that this one-byte write always reaches a return address. Correct alternatives include a 5-byte array for this exact string or length-aware operations. Bounds errors and stack exhaustion are separate problems."
-  },
-  {
-    "title": "Stack protections",
-    "section": "Safety mechanisms",
-    "lead": "Match each mechanism to its purpose.\n\nWhich detects some stack corruption? Which makes addresses less predictable? Which prevents executing instructions from data pages?\n\nDo any of these make an out-of-bounds C write valid?",
-    "example": "A. Stack canary\n\nB. Address-space randomization (ASLR)\n\nC. Non-executable data pages (NX)\n\nStart by fixing the bounds error.",
-    "caption": "Canaries, ASLR, and NX reduce risk. Correct bounds and lifetime handling are still required.",
-    "answer": "1. Detects some stack corruption: A, the stack canary. It is checked for unexpected modification.\n\n2. Makes addresses less predictable: B, ASLR. It randomizes relevant address-space locations.\n\n3. Prevents execution from data pages: C, NX. It blocks instruction execution from pages marked non-executable.\n\n4. Does any mechanism make an out-of-bounds write valid? No. None fixes the invalid write or guarantees protection from every memory error or attack.",
-    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Protection, Using Canaries as Guards, Solution, Limiting Execution, Safety). Keep this at the conceptual defense level. A canary check detects corruption rather than repairing it or catching every write. ASLR and NX address different risks. Actual enabled protections depend on the compiler, binary, operating system, and configuration."
   }
 ]

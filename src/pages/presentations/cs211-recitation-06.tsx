@@ -138,7 +138,7 @@ export default function Recitation06() {
         <title>Quiz 3 review · CS 211 · sebby</title>
         <meta
           name="description"
-          content="CS 211 recitation 06: quiz 3 practice on memory lifetime, allocation, data layout, floating-point values, registers, and stack safety."
+          content="CS 211 recitation 06: quiz 3 practice on memory lifetime, allocation, data layout, floating-point values, and stack exhaustion."
         />
         <link
           rel="canonical"

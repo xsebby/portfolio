@@ -138,8 +138,7 @@ export default function Presentations() {
             </h3>
             <p>
               Practice with stack and heap lifetimes, allocation sizes, structs,
-              unions, alignment, floating-point values and registers, and stack
-              safety.
+              unions, alignment, floating-point values, and stack exhaustion.
             </p>
             <div className={styles.resourceLinks}>
               <Link href="/presentations/cs211-recitation-06">
