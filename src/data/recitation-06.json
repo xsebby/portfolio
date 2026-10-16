@@ -1,0 +1,155 @@
+[
+  {
+    "title": "Quiz 3 review",
+    "section": "CS 211 · Recitation 06",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "Stack and heap\nStructs, unions, and alignment\nFloating-point values and registers",
+    "caption": "",
+    "answer": "",
+    "notes": "Review topics through Lecture 11, as confirmed by the This Quiz section of https://firner.com/presentations/cs211/2026-Fall/cs211_13/ . Use the questions for board work before revealing answers. Examples are original practice problems."
+  },
+  {
+    "title": "Registers, stack, and heap",
+    "section": "Memory",
+    "lead": "Registers are small storage locations inside the CPU, close to the execution units.\n\nThe stack holds active function frames. The heap holds dynamically allocated objects.\n\nStack and heap data reach the CPU through the memory hierarchy.",
+    "example": "Registers: operands and addresses\n\nStack: locals and saved call state\n\nHeap: malloc / calloc allocations\n\nA pointer can refer to either region.",
+    "caption": "A local variable may be optimized into a register; the stack is the usual teaching model.",
+    "answer": "",
+    "notes": "Sources: https://firner.com/presentations/cs211/2026-Fall/cs211_08/ (Registers and Memory), https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (Stack Vs Heap Memory), and https://firner.com/presentations/cs211/2026-Fall/cs211_10/ (Why Align?). A processor has far less register capacity than addressable stack memory. Stack and heap are regions of a process's virtual address space, not separate types of physical RAM."
+  },
+  {
+    "title": "Practice: returning a pointer",
+    "section": "Memory lifetime",
+    "lead": "The caller wants to use the returned array after make_scores finishes.\n\nWhat is wrong with this function?\n\nWould returning a pointer to a successful malloc allocation have the same lifetime problem?",
+    "example": "int *make_scores(void) {\n    int scores[3] = {8, 11, 14};\n    return scores;\n}\n\nint *p = make_scores();\n// Can we safely read p[0]?",
+    "caption": "Ask when the object stops existing, not whether the old bytes might still be visible.",
+    "answer": "No. scores has automatic storage duration; its lifetime ends when the function returns. Reading p[0] afterward is invalid. A successful malloc allocation remains alive until it is freed, so its pointer can be returned. The caller must take responsibility for freeing it.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_08/ (Returning an Array, Memory Ownership) and https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (Returning Memory). Answer: returning the address does not extend scores' lifetime. No access to the dead object is valid, even if memory appears unchanged. Caller-owned output storage is another possible fix. This example uses a fixed-size array so the lifetime issue is independent of VLA support."
+  },
+  {
+    "title": "Dynamic allocation and ownership",
+    "section": "Stack and heap",
+    "lead": "malloc reserves bytes without initializing their values. calloc reserves space and zeroes its bytes.\n\nCheck for NULL before using the allocation.\n\nThe allocation survives function return. Someone must eventually free it exactly once.",
+    "example": "#include <stdlib.h>\n\nint *p = calloc(6, sizeof *p);\nif (p == NULL) {\n    // Handle allocation failure.\n} else {\n    p[0] = 12;\n    free(p);\n    p = NULL;\n}",
+    "caption": "Allocation uses a software allocator backed by OS memory services; it is not a special CPU allocation instruction.",
+    "answer": "",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (malloc, calloc, and free; Failure; The Operating System; free Rules). The allocator can reuse existing blocks without asking the OS on every call. C permits implicit conversion from void* to an object pointer; no cast is needed. Setting p to NULL does not repair any other aliases. free(NULL) is permitted. Do not free an automatic array or an interior pointer."
+  },
+  {
+    "title": "Practice: pointer or allocation?",
+    "section": "Sizes",
+    "lead": "Assume the iLab x86-64 model: pointers are 8 bytes and doubles are 8 bytes. Allocation succeeds.\n\nFind sizeof p, sizeof *p, and the requested allocation size.\n\nDoes free(p) remove the local variable p?",
+    "example": "double *p = calloc(6, sizeof *p);\n\nsizeof p       = ?\nsizeof *p      = ?\nallocated bytes = ?\n\nfree(p);",
+    "caption": "The pointer object and the block it points to are separate objects.",
+    "answer": "sizeof p = 8 bytes. sizeof *p = 8 bytes because *p has type double. The allocation requests 6 × 8 = 48 bytes, excluding allocator overhead. free(p) releases the allocated block; p itself remains in scope and must not be used to access the freed memory.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (Tracking Size) and Lecture 08 (sizeof). These are stated target assumptions, not universal C sizes. sizeof p does not report the number of elements. sizeof *p with a non-VLA type does not read the pointed-to value. A local pointer may live in a register or a stack slot."
+  },
+  {
+    "title": "Structs, unions, and bit fields",
+    "section": "Data layout",
+    "lead": "A struct gives its members distinct storage, with padding where needed.\n\nUnion members overlap the same storage. Writing one changes the bytes seen through the others.\n\nBit fields specify member widths in bits; their layout depends on the implementation.",
+    "example": "struct Pair {\n    int count;\n    float ratio;\n};\n\nunion View {\n    unsigned int bits;\n    float value;\n};\n\n// Example bit-field declaration:\n// unsigned int fraction : 23;",
+    "caption": "Use object.member for an object and pointer->member through a pointer.",
+    "answer": "",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_10/ (Structs, Bit Fields, Union Syntax). A union is large and aligned enough for any member; its size can include padding. Reinterpreting a floating-point representation is not numeric conversion. Bit-field ordering is not guaranteed merely by specifying endianness. For the review's float examples, explicit shifts define the bit positions."
+  },
+  {
+    "title": "Practice: alignment and padding",
+    "section": "Data layout",
+    "lead": "Assume char has size/alignment 1 and int has size/alignment 4. Use ordinary x86-64 layout with no packing.\n\nWhere does each struct member begin? What is sizeof(struct Record)?\n\nWhat changes if struct becomes union?",
+    "example": "struct Record {\n    char tag;\n    int count;\n    char ready;\n};\n\nByte offset:\ntag   = ?\ncount = ?\nready = ?",
+    "caption": "Alignment constrains starting addresses. Padding can appear between members and at the end.",
+    "answer": "tag starts at byte 0; count at byte 4; ready at byte 8. Bytes 1–3 are internal padding and bytes 9–11 are tail padding, so the struct is 12 bytes with alignment 4. As a union, every member starts at byte 0 and the size is 4 bytes under these assumptions.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_10/ (Memory Alignment, Alignment, Packing). Board activity: draw 12 byte slots and label fields, then padding. Tail padding allows each element of an array of Records to keep the required alignment. Do not say every struct is aligned to 8 or that alignment guarantees an entire struct fits in one memory fetch; required alignment depends on members and the ABI."
+  },
+  {
+    "title": "Floating-point fields",
+    "section": "FP32 refresher",
+    "lead": "Separate the sign, stored exponent, and fraction before calculating.\n\nFor a normalized FP32 value, subtract bias 127 and restore the implied leading 1.\n\nFraction positions have weights 1/2, 1/4, 1/8, and so on.",
+    "example": "FP32: 1 sign | 8 exponent | 23 fraction\n\nNormalized value:\n(-1)^s × 2^(E - 127) × (1 + F/2^23)\n\nE = stored exponent as an integer\nF = fraction bits as an integer\n\n1.101₂ = 1 + 1/2 + 1/8",
+    "caption": "The normal formula applies for stored exponents 1–254. Zero and 255 are special cases.",
+    "answer": "",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ (Bias in FP32, Normalized Numbers, Equations). In course terminology, the fraction field may be called significand or mantissa; distinguish the stored fraction from the complete significand 1.f. The superscript denominator counts fraction bits, not total bits."
+  },
+  {
+    "title": "Practice: decode an FP32 value",
+    "section": "Floating point",
+    "lead": "The sign bit is 1. The stored exponent is 129.\n\nThe fraction starts with 0101; all remaining fraction bits are zero.\n\nWhat decimal value is represented? Write the sign, exponent, and significand separately.",
+    "example": "sign:      1\nexponent:  10000001₂ = 129\nfraction:  0101000...000\n\nSign           = ?\nActual exponent = ?\nSignificand     = ?\nValue           = ?",
+    "caption": "The leading 1 belongs before the binary point; the stored fraction goes after it.",
+    "answer": "Sign = −1. Actual exponent = 129 − 127 = 2. Significand = 1.0101₂ = 1 + 1/4 + 1/16 = 1.3125. Value = −1 × 4 × 1.3125 = −5.25.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ . Original practice values. Answer: -5.25. Common mistakes: interpreting sign 1 as positive; using exponent 129 without subtracting bias; using fraction 0.3125 without the implied 1. Verify by normalizing -101.01₂ as -1.0101₂ × 2²."
+  },
+  {
+    "title": "Practice: build the float bits",
+    "section": "Shifts and representation",
+    "lead": "bits begins as zero. The shifts place values into the FP32 exponent and fraction fields.\n\nInterpret the resulting 32 bits as an FP32 value. What is the decimal value?\n\nThis changes a bit pattern; it is not an integer-to-float cast.",
+    "example": "uint32_t bits = 0;\nbits |= (126u << 23);\nbits |= (1u << 22);\nbits |= (1u << 20);\n\nSign bit = 0\nStored exponent = ?\nFraction weights = ?",
+    "caption": "Fraction bit 22 has weight 1/2; bit 21 has weight 1/4; bit 20 has weight 1/8.",
+    "answer": "E = 126, so the actual exponent is −1. The set fraction bits contribute 1/2 + 1/8 = 0.625. The complete significand is 1.625, giving 2^(−1) × 1.625 = 0.8125. The final bit pattern is 0x3F500000.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ (Implementation Details, Now with Significand) and https://firner.com/presentations/cs211/2026-Fall/cs211_10/ (Reinterpreting Data). Include stdint.h for uint32_t. Answer: 0.8125. To inspect the representation in ordinary C on the stated FP32 system, use float f; memcpy(&f, &bits, sizeof f); with string.h, avoiding pointer-aliasing casts. A numeric conversion (float)bits would produce a different result."
+  },
+  {
+    "title": "Extra practice: encode −6.5",
+    "section": "Floating point",
+    "lead": "Work in the opposite direction: start with a decimal value and find its FP32 fields.\n\nConvert the magnitude to binary, normalize it, then apply the bias.\n\nWhat are the sign bit, stored exponent, and fraction bits?",
+    "example": "6.5₁₀ = ?₂\n\nNormalize:\n1._____₂ × 2^?\n\nSign = ?\nStored exponent = ? + 127\nFraction = ? (then zero-fill)",
+    "caption": "Normalization moves the binary point. It does not discard the fractional part.",
+    "answer": "6.5 = 110.1₂ = 1.101₂ × 2². For −6.5, sign = 1; stored exponent = 2 + 127 = 129 = 10000001₂; fraction = 101 followed by 20 zeros. The FP32 bit pattern is 0xC0D00000.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ . Original additional float question requested by the TA. Write the place values 4,2,1,1/2 on the board; 6.5 uses 4 + 2 + 1/2. The leading normalized 1 is implied and is not copied into the 23-bit fraction field. Answer fields: 1 | 10000001 | 10100000000000000000000."
+  },
+  {
+    "title": "Zero, subnormals, infinity, and NaN",
+    "section": "Floating-point cases",
+    "lead": "Check the exponent field before using a formula.\n\nA zero exponent has no implied leading 1. Its scale uses 1 − bias.\n\nAn all-ones exponent represents infinity or NaN, depending on the fraction.",
+    "example": "Stored E    Fraction F    Meaning\n0           0             ±0\n0           nonzero       subnormal\n1–254       any           normal\n255         0             ±infinity\n255         nonzero       NaN\n\nSubnormal magnitude:\n2^(1 - 127) × F/2^23",
+    "caption": "A stored exponent of zero does not mean the whole number must be zero.",
+    "answer": "",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_05/ (NaN and Infinity, Subnormal Numbers, Equations). The subnormal magnitude expression omits sign deliberately; multiply by (-1)^s for the signed value. For normal values the complete significand is 1.f; for subnormal values it is 0.f. Ask whether E=0,F=1 is zero: it is the smallest positive subnormal when sign=0."
+  },
+  {
+    "title": "Floating-point register families",
+    "section": "Hardware",
+    "lead": "x87 has eight 80-bit registers organized as a register stack. This is separate from the function-call stack.\n\nXMM registers are 128 bits wide. Scalar float instructions use one value within that register.\n\nYMM registers are 256 bits wide; their low 128 bits overlap XMM.",
+    "example": "x87:  ST(0) ... ST(7)   80 bits\nMMX:  mm0 ... mm7       64 bits\n      packed integers; aliases x87\nXMM:  xmm0 ... xmm15   128 bits\nYMM:  ymm0 ... ymm15   256 bits\n\nmovss / addss: scalar FP32\nmovsd / addsd: scalar FP64",
+    "caption": "The register width is not the size of every value it holds. Names here use the baseline x86-64 model.",
+    "answer": "",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Different Hardware, Space, FPU, Register Features, Moving floats). Additional reference: https://cdrdv2-public.intel.com/843820/325462-sdm-vol-1-2abcd-3abcd-4-1.pdf (basic execution environment and SSE/AVX register organization). Technical clarification: MMX mm registers are distinct from SSE xmm names; MMX is for packed integers and aliases the x87 register storage. XMM is 16 bytes, YMM is 32 bytes. Legacy scalar ss operations use the low 32-bit floating-point element; sd uses the low 64-bit element. Newer extensions may provide additional registers. Do not confuse the x87 register stack with RAM addressed by rsp."
+  },
+  {
+    "title": "Practice: scalar float instructions",
+    "section": "Assembly",
+    "lead": "Initially, the low float in %xmm0 is 2.5 and the low float in %xmm1 is 4.0.\n\nWhat value is in %xmm0 after each instruction?\n\nWhy convert to double before passing a float to printf?",
+    "example": "# AT&T: source, destination\nmulss %xmm1, %xmm0\naddss %xmm1, %xmm0\ncvtss2sd %xmm0, %xmm0\n\nss = scalar single precision\nsd = scalar double precision",
+    "caption": "For these operations, %xmm0 is the destination; %xmm1 stays unchanged.",
+    "answer": "mulss produces 2.5 × 4.0 = 10.0. addss produces 10.0 + 4.0 = 14.0. cvtss2sd converts the low scalar value to a double, still 14.0. C promotes float arguments to double for variadic functions such as printf; %f expects that promoted value.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Moving floats, Operations, Other Operations, Passing a Float). These small values are represented exactly. Under the System V AMD64 convention, scalar float/double arguments normally use XMM registers, not the x87 stack; first such argument is normally xmm0. SS is 32-bit scalar, SD is 64-bit scalar. Avoid describing this as a conversion of the entire 128-bit register."
+  },
+  {
+    "title": "Practice: exhausting the stack",
+    "section": "Stack overflow",
+    "lead": "Active calls keep their frames until they return. Deep recursion or large local arrays can exhaust the available stack.\n\nAssume each active frame needs 2 KiB and only 64 KiB is available. Ignore all other overhead.\n\nCan 40 active calls fit?",
+    "example": "Stack grows toward lower addresses\non the course's x86-64 model.\n\n40 frames × 2 KiB = ?\n\nBudget = 64 KiB\n1 KiB = 1024 bytes",
+    "caption": "Stack exhaustion is different from writing past the end of a stack buffer.",
+    "answer": "No. 40 × 2 KiB = 80 KiB, which exceeds 64 KiB. At most 32 frames fit in this simplified model. Real frames have other costs, and stack limits depend on the environment. The stack need not literally collide with the heap to overflow.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_09/ (Unwinding, Stack Overflows). An active frame cannot be reclaimed while its caller still needs its state. Optimization can eliminate frames or transform recursion, so the question explicitly assumes a fixed active-frame cost. Heap growth is a useful simplified diagram; real allocators also use independent mapped regions and are not one universally contiguous upward-growing area."
+  },
+  {
+    "title": "Practice: writing past a buffer",
+    "section": "Stack corruption",
+    "lead": "How many bytes fit in name, including the terminating null byte?\n\nIdentify the invalid write.\n\nCould it affect nearby stack data? Is a crash guaranteed?",
+    "example": "void label(void) {\n    char name[4];\n    name[0] = 'C';\n    name[1] = 'S';\n    name[2] = '2';\n    name[3] = '1';\n    name[4] = '\\0';\n}",
+    "caption": "An invalid write is undefined behavior even when the program appears to run normally.",
+    "answer": "name has 4 bytes, with valid indices 0–3. The terminator at name[4] is out of bounds. A 4-byte buffer holds at most 3 ordinary string characters plus a null terminator. A write past a stack buffer can corrupt adjacent data or saved call state, but the exact effect and whether it crashes are not guaranteed.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Stack Corruption, Buffer Overflows). This is a conceptual C example; an optimizer may remove unused stores. Do not claim a particular stack layout or that this one-byte write always reaches a return address. Correct alternatives include a 5-byte array for this exact string or length-aware operations. Bounds errors and stack exhaustion are separate problems."
+  },
+  {
+    "title": "Stack protections",
+    "section": "Safety mechanisms",
+    "lead": "Match each mechanism to its purpose.\n\nWhich detects some stack corruption? Which makes addresses less predictable? Which prevents executing instructions from data pages?\n\nDo any of these make an out-of-bounds C write valid?",
+    "example": "A. Stack canary\n\nB. Address-space randomization (ASLR)\n\nC. Non-executable data pages (NX)\n\nStart by fixing the bounds error.",
+    "caption": "Canaries, ASLR, and NX reduce risk. Correct bounds and lifetime handling are still required.",
+    "answer": "A: a canary is checked for unexpected modification and can detect some stack overwrites. B: ASLR randomizes relevant address-space locations. C: NX prevents instruction execution from pages marked non-executable. None makes an invalid write valid, and none guarantees protection from every memory error or attack.",
+    "notes": "Source: https://firner.com/presentations/cs211/2026-Fall/cs211_11/ (Protection, Using Canaries as Guards, Solution, Limiting Execution, Safety). Keep this at the conceptual defense level. A canary check detects corruption rather than repairing it or catching every write. ASLR and NX address different risks. Actual enabled protections depend on the compiler, binary, operating system, and configuration."
+  }
+]

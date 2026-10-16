@@ -127,6 +127,30 @@ export default function Presentations() {
             </div>
           </div>
         </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>06</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 06</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-06">
+                Quiz 3 review
+              </Link>
+            </h3>
+            <p>
+              Practice with stack and heap lifetimes, allocation sizes, structs,
+              unions, alignment, floating-point values and registers, and stack
+              safety.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-06">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="/presentations/CS211_Recitation_6.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
       </section>
       <footer className={styles.hubFooter}>
         Course deadlines and submission details live on Canvas.

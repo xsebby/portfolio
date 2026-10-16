@@ -1,0 +1,36 @@
+.viewer article {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.viewer article h1,
+.viewer article h2 {
+  margin-bottom: 32px;
+}
+.viewer .lead {
+  min-width: 0;
+  font-size: clamp(18px, 1.8vw, 24px);
+  line-height: 1.45;
+}
+.viewer .example {
+  min-width: 0;
+  font-size: clamp(13px, 1.5vw, 21px);
+  line-height: 1.55;
+}
+.viewer .caption {
+  margin-top: 28px;
+}
+.answer {
+  margin-top: 16px;
+  max-width: 1050px;
+  font-size: 18px;
+  line-height: 1.55;
+}
+.answer summary {
+  color: #6ee7b7;
+  cursor: pointer;
+  width: fit-content;
+}
+.answer p {
+  margin-top: 12px;
+  color: #d4d4d8;
+}
