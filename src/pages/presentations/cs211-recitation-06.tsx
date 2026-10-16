@@ -39,7 +39,9 @@ function SlideContent({
       {slide.answer && (
         <details key={`${index}-${reading}`} className={reviewStyles.answer}>
           <summary>Show answer</summary>
-          <p>{slide.answer}</p>
+          {slide.answer.split("\n\n").map((answer) => (
+            <p key={answer}>{answer}</p>
+          ))}
         </details>
       )}
     </article>
