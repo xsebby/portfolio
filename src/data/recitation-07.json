@@ -48,7 +48,7 @@
     "lead": "On the course’s x86-64 model, the stack grows toward lower addresses. Subtracting from %rsp reserves space.\n\nWith this frame-pointer setup, cleanup moves %rsp back to %rbp, then restores the caller’s %rbp.",
     "example": "# A conventional frame\npushq %rbp\nmovq %rsp, %rbp\nsubq $32, %rsp\n\n# Cleanup (leave is equivalent)\nmovq %rbp, %rsp\npopq %rbp\nret",
     "caption": "Direction matters: cleanup copies RBP into RSP, not RSP into RBP.",
-    "answer": "1. subq $32, %rsp decreases RSP by 32, reserving 32 bytes below its previous position.\n\n2. movq %rbp, %rsp restores RSP to this frame’s base. popq restores the saved caller RBP. ret consumes the return address and resumes the caller.",
+    "answer": "",
     "notes": "Board: start after establishing RBP with RBP=1000 and RSP=1000. After subtracting 32, RSP=968. On cleanup RSP becomes 1000, then pop moves it by 8. Keep the old RBP save and return address separate. The return address was saved by call before this prologue; ret returns to the instruction AFTER call. Not every optimized function uses a frame pointer or this exact prologue. Reclaimed stack bytes need not be erased; the object lifetime is what ends. This addresses the reversed cleanup copy in the quiz.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_08/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/",
     "table": null
   },
