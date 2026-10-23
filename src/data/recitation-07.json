@@ -1,0 +1,349 @@
+[
+  {
+    "title": "Midterm review",
+    "section": "CS 211 · Recitation 07",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "Pointers and memory\nFloat bits, structs, and unions\nAssembly and digital logic",
+    "caption": "",
+    "answer": "",
+    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–18. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "table": null
+  },
+  {
+    "title": "A pointer is an address",
+    "section": "Pointers and sizes",
+    "lead": "Think of a pointer as a house address. The address fits on the same size label whether the house is large or small.\n\nThe pointed-to type tells C how to read the object and how far p + 1 moves.",
+    "example": "Assume x86-64: pointer = 8 bytes\nint = 4 bytes; char = 1 byte\n\nint *p = calloc(7, sizeof *p);",
+    "caption": "The address, one element, and the whole allocation have different sizes.",
+    "answer": "1. sizeof p = 8 bytes: the pointer.\n\n2. sizeof *p = 4 bytes: one int.\n\n3. The requested block is 7 × 4 = 28 bytes, excluding allocator overhead.",
+    "notes": "Say: The address label is not the house. Draw a small box p containing 0x1000, then seven int boxes elsewhere. Ask which box sizeof p measures. An int*, short*, and char* have the same pointer size under the stated iLab model. Do not say every C implementation has 8-byte pointers. calloc requires stdlib.h; assume allocation succeeds here.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_03/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/",
+    "table": {
+      "headers": ["Expression", "Bytes"],
+      "rows": [["sizeof p", "?"], ["sizeof *p", "?"], ["Requested block", "?"]]
+    }
+  },
+  {
+    "title": "Registers, stack, and heap",
+    "section": "Memory locations",
+    "lead": "Registers are the CPU’s small working spaces. They are not part of the stack.\n\nThe stack holds active function frames. The heap holds dynamic allocations.\n\nA register can hold an address pointing into either memory region.",
+    "example": "Register: a value or an address\n\nStack: local objects and call state\n\nHeap: malloc / calloc objects\n\nA pointer does not tell us ownership.",
+    "caption": "Registers are close to execution units; they are not megabytes of stack storage.",
+    "answer": "",
+    "notes": "Analogy: registers are items in your hands; a stack frame is temporary desk space for the current task; a heap allocation is storage you keep until you explicitly release it. The analogy explains lifetime, not an exact physical memory layout. Local variables may be optimized into registers. Stack and heap are regions of virtual address space and use the memory hierarchy. A saved register VALUE can be copied onto the stack; the register itself is not located there.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_08/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/",
+    "table": null
+  },
+  {
+    "title": "Returning memory safely",
+    "section": "Lifetime and ownership",
+    "lead": "A function’s automatic local array stops existing when that function returns. Returning its address does not extend its life.\n\nA successful heap allocation survives the return. Its owner must eventually free it.",
+    "example": "int *bad(void) {\n    int a[3] = {2, 4, 6};\n    return a;\n}\n\nint *make(void) {\n    return calloc(3, sizeof(int));\n}",
+    "caption": "Which returned pointer can the caller use, assuming allocation succeeds?",
+    "answer": "1. bad returns an address of an object whose lifetime has ended. The caller must not dereference that pointer.\n\n2. make returns a heap allocation that remains alive until free. Check for NULL, use it, then free it once.",
+    "notes": "Say: A forwarding address does not keep a demolished house standing. Contrast lifetime of the local pointer variable with lifetime of the allocation it points to. Returning a pointer is normal; returning a pointer to a dead local object is the error. Include stdlib.h for calloc. Explain that calloc zeroes allocated bytes, while malloc leaves the bytes uninitialized. The allocator is software backed by OS memory services, not a special heap-allocation CPU instruction. A caller-owned output array is another valid design.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_08/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/",
+    "table": null
+  },
+  {
+    "title": "Stack setup and cleanup",
+    "section": "Assembly and lifetime",
+    "lead": "On the course’s x86-64 model, the stack grows toward lower addresses. Subtracting from %rsp reserves space.\n\nWith this frame-pointer setup, cleanup moves %rsp back to %rbp, then restores the caller’s %rbp.",
+    "example": "# A conventional frame\npushq %rbp\nmovq %rsp, %rbp\nsubq $32, %rsp\n\n# Cleanup (leave is equivalent)\nmovq %rbp, %rsp\npopq %rbp\nret",
+    "caption": "Direction matters: cleanup copies RBP into RSP, not RSP into RBP.",
+    "answer": "1. subq $32, %rsp decreases RSP by 32, reserving 32 bytes below its previous position.\n\n2. movq %rbp, %rsp restores RSP to this frame’s base. popq restores the saved caller RBP. ret consumes the return address and resumes the caller.",
+    "notes": "Board: start after establishing RBP with RBP=1000 and RSP=1000. After subtracting 32, RSP=968. On cleanup RSP becomes 1000, then pop moves it by 8. Keep the old RBP save and return address separate. The return address was saved by call before this prologue; ret returns to the instruction AFTER call. Not every optimized function uses a frame pointer or this exact prologue. Reclaimed stack bytes need not be erased; the object lifetime is what ends. This addresses the reversed cleanup copy in the quiz.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_08/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/",
+    "table": null
+  },
+  {
+    "title": "An address or its contents?",
+    "section": "Assembly operands",
+    "lead": "$ introduces a literal constant. A bare register names its stored value. Parentheses in a mov source mean read memory at the calculated address.\n\nlea calculates an address without reading that memory.",
+    "example": "# rbx = 0x1000\n# 8-byte value at 0x1000 is 27\n\nmovq $6, %rax       # rax = ?\nmovq %rbx, %rax     # rax = ?\nmovq (%rbx), %rax   # rax = ?\nleaq 8(%rbx), %rax  # rax = ?",
+    "caption": "Copying an address and fetching what is stored there are different operations.",
+    "answer": "1. The immediate move puts 6 in RAX.\n\n2. The register move copies 0x1000 into RAX.\n\n3. The memory load reads 27 into RAX.\n\n4. lea computes 0x1008; it does not read memory at 0x1008.",
+    "notes": "Say: Copy the address label versus go to that address and pick up the contents. Registers do not have ordinary memory addresses that mov is implicitly accessing. In movq -8(%rbp), %rax, calculate RBP−8 first, then read 8 bytes there. In leaq -8(%rbp), %rax, only the calculation happens. Walk students through source first, destination second in AT&T syntax.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_07/",
+    "table": null
+  },
+  {
+    "title": "Instruction width and register names",
+    "section": "Assembly sizes",
+    "lead": "The suffix describes the operand width. It does not depend on whether the literal looks small.\n\nEAX is the low 32-bit part of RAX. Writing EAX also clears the upper 32 bits of RAX.",
+    "example": "Suffix   Width\nb        8 bits\nw        16 bits\nl        32 bits\nq        64 bits\n\nmovl $5, %eax  # 32-bit write\nmovq $5, %rax  # 64-bit write",
+    "caption": "A 64-bit machine still has instructions that operate on 8, 16, or 32 bits.",
+    "answer": "",
+    "notes": "Ask: If the value is 5, does the q instruction only use three bits? No; the operand width is still 64 bits. Separate value magnitude from storage width. Pointer addresses normally use q operations on iLab. AL and AX are smaller subregisters; unlike EAX writes, writes to AL or AX do not generally zero all the other bits of RAX. Source: assembly instruction suffixes in Lecture 07.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_07/",
+    "table": null
+  },
+  {
+    "title": "Array indexing is address arithmetic",
+    "section": "Pointers and scaled operands",
+    "lead": "C advances by elements: p + 2 skips two whole ints. Assembly calculates the byte address explicitly.\n\nFor displacement(base, index, scale), calculate displacement + base + index × scale.",
+    "example": "# rax = 0x1000; rcx = 2\n# int elements are 4 bytes\n\nmovl 4(%rax,%rcx,4), %edx\n\nAddress = 4 + 0x1000 + 2 × 4\n        = ?\n\nWhich zero-based array index?",
+    "caption": "An index of 2 means the third element; displacement can move the access further.",
+    "answer": "1. The address is 0x100C: 12 bytes past the base.\n\n2. For 4-byte ints, this is index 3, the fourth element. The instruction loads that element’s value into EDX.",
+    "notes": "Draw a[0] at 0x1000, a[1] at 0x1004, a[2] at 0x1008, and a[3] at 0x100C. First do the multiplication, then include the extra displacement 4. Contrast C p+2, which already scales by sizeof *p, with byte arithmetic in assembly. Element size is an assumption here; an arbitrary scale of 4 in machine code is not by itself proof of the original C type.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_03/; https://firner.com/presentations/cs211/2026-Fall/cs211_07/",
+    "table": null
+  },
+  {
+    "title": "Struct: separate fields; union: shared bytes",
+    "section": "Structs and unions",
+    "lead": "A struct gives each member its own place.\n\nA union gives different names to overlapping storage. Writing through one name changes the bytes seen through the other name.\n\nThink: separate drawers versus two labels on the same drawer.",
+    "example": "struct Separate {\n    float value;\n    unsigned int bits;\n};\n\nunion Shared {\n    float value;\n    unsigned int bits;\n};",
+    "caption": "Assume float and unsigned int are 4 bytes, with alignment 4.",
+    "answer": "1. Separate is 8 bytes under these assumptions: two distinct 4-byte fields.\n\n2. Shared is 4 bytes: both members refer to the same four bytes. Their sizes are not added together.",
+    "notes": "Put two separate 4-byte rectangles on the board for the struct. For the union, draw one 4-byte rectangle with two names above it. Ask where a write to bits goes. Union storage can include alignment padding in general; largest member size is the starting point, not a universal no-padding rule. Neither a union nor a cast automatically changes an integer bit pattern into the numeric float of that integer.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_10/",
+    "table": null
+  },
+  {
+    "title": "Alignment leaves gaps for a reason",
+    "section": "Data layout",
+    "lead": "Alignment says where an object is allowed to start. A 4-byte-aligned int starts at an address divisible by 4.\n\nThe compiler inserts padding to preserve those boundaries, including between array elements.",
+    "example": "struct Record {\n  char tag; int count; char ready;\n};\n// char: 1-byte size/alignment\n// int: 4-byte size/alignment",
+    "caption": "Assume ordinary x86-64 layout with no packing. What is the total size?",
+    "answer": "1. tag starts at offset 0, count at 4, and ready at 8.\n\n2. The total is 12 bytes. Bytes 1–3 are internal padding; bytes 9–11 are tail padding, so the next Record in an array can also align its int.",
+    "notes": "Draw 12 byte boxes. Fill byte 0 with tag, bytes 4–7 with count, byte 8 with ready. Mark the rest as padding. Say: padding is a gap, not an extra variable or a buffer-overflow defense. Do not teach that every struct must align to 8 bytes, or that alignment guarantees a whole struct is fetched with one memory request. It can reduce split or unaligned accesses; ABI layout is the concrete rule we use.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_10/",
+    "table": {
+      "headers": ["Member", "Offset", "Bytes"],
+      "rows": [
+        ["tag", "0", "1"],
+        ["padding", "1–3", "3"],
+        ["count", "4", "4"],
+        ["ready", "8", "1"],
+        ["tail padding", "9–11", "3"]
+      ]
+    }
+  },
+  {
+    "title": "Float bits are three fields",
+    "section": "Floating-point foundation",
+    "lead": "Separate the sign, stored exponent, and stored fraction before doing any arithmetic.\n\nFor a normal number, the fraction has an implied 1 before the binary point. Subtract the bias from the stored exponent.",
+    "example": "FP32: 1 sign, 8 exponent, 23 fraction\n\nvalue = (-1)^s × 2^(E-127) × (1.f)\n\nE: stored exponent as an integer\n1.f: complete binary significand\n\nFraction weights: 1/2, 1/4, 1/8, ...",
+    "caption": "The stored fraction and the full significand are not the same thing.",
+    "answer": "",
+    "notes": "Say: sign chooses plus or minus; exponent chooses scale; fraction chooses the detail between powers of two. A stored fraction 100... means one half, but the complete normal significand is 1.5. A stored exponent 128 is not the actual exponent 128: it gives 128−127=1. The normal formula applies when E is neither zero nor all ones. We handle those special cases later. The course sometimes calls the stored fraction the significand; make that vocabulary explicit.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "A small float, one step at a time",
+    "section": "Worked example",
+    "lead": "Format: 1 sign bit, 5 exponent bits, 2 fraction bits. Bias = 15.\n\nDecode 1 | 10000 | 10.\n\nUse the field values, not the whole 8-bit pattern as an integer.",
+    "example": "Sign:      1 means negative\nExponent:  10000₂ = 16\nScale:     2^(16−15) = 2\nFraction:  .10₂ = 1/2\nSignificand: 1.10₂ = 1.5\n\nValue = −1 × 2 × 1.5 = −3",
+    "caption": "The exponent and fraction fields can also be reported as integers: E = 16, F = 2.",
+    "answer": "",
+    "notes": "Board: draw three boxes with widths 1,5,2. First circle the sign. Convert only 10000 to decimal 16. Show that fraction bits 10 mean F=2 as an integer, but F/2²=2/4=0.5 as a contribution. Ask: is the significand 2 or 1.5? Answer: the stored fraction integer is 2; the complete significand is 1.5. This is the distinction students need on the old quiz fill-in questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "Quiz 3: the bit-field initialization",
+    "section": "Worked walkthrough · part 1",
+    "lead": "A designated initializer sets exponent to 128. The other named fields are initialized to zero.\n\nUnder the course’s FP32 layout, those fields describe a positive normal float.\n\nWhat is the first value?",
+    "example": "struct FloatBits {\n    unsigned int significand : 23;\n    unsigned int exponent : 8;\n    unsigned int sign : 1;\n};\nstruct FloatBits fb = {.exponent = 128};\n\n// s = 0, E = 128, F = 0",
+    "caption": "Use the course’s x86-64 bit-field layout; C bit-field ordering is implementation-dependent.",
+    "answer": "1. Sign is positive because s = 0.\n\n2. Actual exponent is 128 − 127 = 1.\n\n3. F = 0 gives a complete significand of 1.0.\n\n4. The first value is 1 × 2¹ × 1.0 = 2.0.",
+    "notes": "This explains released Quiz 3A Q6. Assume the typedef from the quiz, typedef struct FloatBits FloatBits. Say: not explicitly writing sign and significand does not leave these named fields random in this initializer. They become zero. Zero stored fraction still gives the implied leading 1 for a normal float. The original *(float*)&fb pointer cast assumes layout and aliasing behavior; it is not portable C. Explain the intended bit interpretation, not that this casting technique is universally safe. memcpy between a uint32_t representation and a float avoids the pointer aliasing problem on a known FP32 system.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; released Quiz 3A, Q6",
+    "table": null
+  },
+  {
+    "title": "Quiz 3: follow the union writes",
+    "section": "Worked walkthrough · part 2",
+    "lead": "The two member names refer to the same four bytes.\n\nThe initial 12.0 does not survive a later write of integer zero. That write replaces all 32 bits.\n\nAlways trace assignments in order.",
+    "example": "union FloatInt { float f; int i; };\nunion FloatInt u = {.f = 12.0f};\nu.i = 0;\nu.i |= (127 << 23) | (1 << 22);",
+    "caption": "Assume the course’s 4-byte int and IEEE FP32 layout. This is reinterpretation, not numeric conversion.",
+    "answer": "1. The float initialization writes the FP32 representation of 12.0.\n\n2. u.i = 0 overwrites those same four bytes with zeros.\n\n3. The OR expression builds a new float representation in those shared bytes. The initial 12.0 no longer affects the result.",
+    "notes": "This explains the setup for released Quiz 3A Q7. Say: the union does not keep one copy of 12.0 and a separate integer. Draw one 32-bit strip, write 12.0 bits, erase them for the integer assignment, then insert the new exponent and fraction bits. The int constants used here fit the course’s 32-bit signed int. Prefer unsigned values for new bit manipulation code. sizeof this union is 4 bytes under the stated assumptions, addressing Q8.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_10/; released Quiz 3A, Q7–Q8",
+    "table": {
+      "headers": ["Write", "Shared 32-bit pattern"],
+      "rows": [
+        ["f = 12.0f", "0x41400000"],
+        ["i = 0", "0x00000000"],
+        ["OR new fields", "0x3FC00000"]
+      ]
+    }
+  },
+  {
+    "title": "Quiz 3: turn the new bits into a value",
+    "section": "Worked walkthrough · part 3",
+    "lead": "127 << 23 places 127 in the exponent field. It does not multiply the final float by 2²³.\n\n1 << 22 sets the first fraction bit, whose weight is 1/2.\n\nNow decode the fields normally.",
+    "example": "Sign:      0\nExponent:  127 = 01111111₂\nFraction:  100000...000\n\nActual exponent = 127−127 = 0\nSignificand = 1 + 1/2 = 1.5\n\nValue = 2⁰ × 1.5 = 1.5",
+    "caption": "The second printed value is 1.5. The union is 4 bytes under the quiz’s layout.",
+    "answer": "",
+    "notes": "Board: number the bit positions 31, 30–23, 22–0. Put a 1 at bit 22. Ask: does that bit contribute 2²² to the FLOAT value? No. It contributes that weight to the integer bit pattern, but one half to the float’s fraction. Say: first arrange the bits, then use the float formula. A numeric cast such as (float)some_integer converts a number; reading the shared representation gives a different interpretation of the same bytes.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; released Quiz 3A, Q7",
+    "table": null
+  },
+  {
+    "title": "Your turn: a different exponent and fraction",
+    "section": "Floating-point practice",
+    "lead": "Use the same FP32 layout and bias 127.\n\nWhat value comes from the initialized fields?\n\nWhat value does the unsigned bit pattern represent when interpreted as FP32?",
+    "example": "// Case A: initialized fields\ns = 0; E = 126; F = 0;\n\n// Case B: an FP32 bit pattern\nuint32_t bits = (129u << 23)\n              | (1u << 21);",
+    "caption": "Do not add the integer values of the shifted terms and treat that sum as the float.",
+    "answer": "1. Case A: 2^(126−127) × 1.0 = 0.5.\n\n2. Case B: actual exponent = 129−127 = 2. Fraction bit 21 contributes 1/4, so the full significand is 1.25. The value is 4 × 1.25 = 5.0.",
+    "notes": "Pause for a full minute. Ask students to write E−bias and 1.f separately before doing multiplication. If someone says the case B fraction is one half, have them label bit 22 first, then bit 21. No sign bit is set. F denotes the stored fraction integer in case A, so F=0 does not mean the whole number is zero. A uint32_t declaration needs stdint.h.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "Encode a decimal float",
+    "section": "Floating-point practice",
+    "lead": "Use the 8-bit format: 1 sign bit, 5 exponent bits, 2 fraction bits; bias 15.\n\nRepresent −0.75. First convert the magnitude to binary and normalize it.\n\nReport the stored fields in decimal too.",
+    "example": "0.75 = 0.11₂\n\nNormalize: 1.1₂ × 2^(?)\n\nSign bit = ?\nStored exponent = ?\nFraction bits = ?\nStored fraction integer F = ?",
+    "caption": "The leading normalized 1 is implied; only the bits after the point are stored.",
+    "answer": "1. 0.11₂ = 1.1₂ × 2^(−1).\n\n2. The sign bit is 1.\n\n3. Stored exponent = −1 + 15 = 14, or 01110₂.\n\n4. Fraction bits are 10, so the stored fraction integer F = 2. The full encoding is 1 | 01110 | 10.",
+    "notes": "Say: move the binary point one place right to create 1.1, so compensate with an exponent of −1. Then add the bias; do not subtract it during encoding. Two fraction bits give room for .10. Explain why this value is exact: the fraction is a finite binary fraction and fits the field. Compare with the old quiz format, but use the new value so students must transfer the method.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "Rounding means choosing an available value",
+    "section": "Range and precision",
+    "lead": "A limited fraction field leaves gaps between representable values.\n\nWith two fraction bits near magnitude 1, the normal significands are 1.00, 1.01, 1.10, and 1.11.\n\nWhich is closest to −1.3?",
+    "example": "Available magnitudes near 1:\n1.00₂ = 1.00\n1.01₂ = 1.25\n1.10₂ = 1.50\n1.11₂ = 1.75\n\nDistance to −1.25: ?\nDistance to −1.50: ?",
+    "caption": "More exponent bits help range; more fraction bits help precision. Gaps grow with scale.",
+    "answer": "1. The distance to −1.25 is 0.05.\n\n2. The distance to −1.50 is 0.20.\n\n3. The closest representable value is −1.25, under the stated format and round-to-nearest rule.",
+    "notes": "Draw four marks on a number line, then place −1.3 between −1.5 and −1.25. Closest does not mean always round toward zero; compare distances. At the next power-of-two range the spacing doubles. The examples avoid a midpoint tie; a tie rule such as ties-to-even matters when distances are equal. FP arithmetic can round, but not every float operation is slower than its integer counterpart: different hardware and operations have different costs.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "Special exponents change the rule",
+    "section": "Zero and subnormal values",
+    "lead": "Check the exponent before applying the normal formula.\n\nAn exponent of all zeros uses 0.f and a scale of 2^(1−bias).\n\nAn exponent of all ones means infinity or NaN.",
+    "example": "For the 1 / 5 / 2 format, bias 15:\n\nE = 0, F = 0: zero\nE = 0, F > 0: subnormal\nE = 1..30: normal\nE = 31, F = 0: infinity\nE = 31, F > 0: NaN\n\nDecode s=0, E=0, F=1.",
+    "caption": "A zero stored exponent does not force the whole number to be zero.",
+    "answer": "1. E=0 and F=1 is subnormal.\n\n2. Fraction = 1/2² = 1/4, with no implied leading 1.\n\n3. Value = 2^(1−15) × 1/4 = 2^(−16).",
+    "notes": "Ask students to compare E=0,F=0 and E=0,F=1. The second retains a tiny positive magnitude. For FP32, replace the bias by 127, fraction-bit count by 23, and all-ones E by 255. Be careful not to use 2^(0−bias) for subnormals. Zero’s sign bit permits +0 or −0.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
+    "table": null
+  },
+  {
+    "title": "A 64-bit CPU can have wider registers",
+    "section": "Floating-point registers",
+    "lead": "The machine’s common integer-register width does not set the maximum size of every register.\n\nAn XMM register can hold a scalar 32-bit float even though the register itself is 128 bits wide.\n\nWider extensions depend on the supported instruction set.",
+    "example": "x87: 80-bit floating-point registers\nXMM: 128 bits = 16 bytes\nYMM: 256 bits = 32 bytes\nZMM: 512 bits = 64 bytes (AVX-512)\n\nmovss / addss: low scalar FP32\nmovsd / addsd: low scalar FP64",
+    "caption": "There is no universal “largest register = 64 bits” rule for a 64-bit system.",
+    "answer": "1. A 32-bit float stored in XMM does not make XMM a 32-bit register. XMM is 128 bits wide.\n\n2. The largest available register depends on CPU extensions; common examples are wider than 64 bits.",
+    "notes": "Say: a large tray can hold one small cup; tray size and cup size are different. This is why both 64-bit and 8-byte choices on released Quiz 3A Q11 were insufficient. XMM is the low 128 bits of the corresponding YMM; ZMM, when present, extends that storage further. x87 has its own register stack, separate from the function-call stack. MMX registers are packed-integer aliases of x87 storage, not another name for XMM. Scalar mulss/addss use float values, not integer addition of their bit encodings.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_11/; https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html",
+    "table": null
+  },
+  {
+    "title": "Stack exhaustion and stack corruption",
+    "section": "Stack safety",
+    "lead": "Exhaustion: too many active frames or large local allocations use up the available stack.\n\nCorruption: code writes outside a valid object and may overwrite nearby state.\n\nA canary is a marker checked for unexpected change.",
+    "example": "char word[4];\n// Valid indexes: 0,1,2,3\nword[4] = 0;  // invalid write\n\nCanary: detects some overwrites\nASLR: makes addresses less predictable\nNX: blocks execution from data pages",
+    "caption": "Why is word[4] invalid? What does an unexpectedly changed guard suggest?",
+    "answer": "1. word[4] is outside the 4-byte array and is undefined behavior. It is a bounds error, not proof the entire stack has run out.\n\n2. An unexpectedly changed guard suggests corruption, not normal stack cleanup. The exact effect and whether a crash occurs are not guaranteed.",
+    "notes": "Use a desk analogy: running out of desk space differs from scribbling over someone else’s paper. The old quiz guard is conceptual canary behavior. A callee may write through a valid pointer into caller-owned data, so not every cross-frame write is inherently illegal; the unexpected unauthorized overwrite is the problem. Canaries detect some corruption, ASLR changes predictability, and NX changes execution permissions. Do not imply the byte pattern identifies the exact buggy instruction.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_11/",
+    "table": null
+  },
+  {
+    "title": "Hex, binary, and byte order",
+    "section": "Representation recap",
+    "lead": "One hex digit represents four bits. Convert one digit at a time.\n\nEndianness orders bytes in memory; it does not reverse the bits within each byte.\n\nStart at the lowest address when listing stored bytes.",
+    "example": "0xD6 = 1101 0110₂\n0x1234, low address first:\nLittle endian: 34 12\nBig endian:    12 34\n\nYour turn:\n1. 0xA7 in binary?\n2. Bytes of 0xA7B2, little-endian?",
+    "caption": "Same numeric value, different byte order in memory.",
+    "answer": "1. 0xA7 expands to 1010 0111₂.\n\n2. In little-endian memory, 0xA7B2 as a 16-bit value stores B2 first, then A7.",
+    "notes": "Ask the two answer-reveal questions aloud: convert 0xA7; then list bytes of 0xA7B2 little-endian. Break into 4-bit groups and insist on preserving leading zeros within each nibble. For the endian example, draw addresses 1000 and 1001 and place full byte pairs into them. Do not reverse the digits inside a byte or the individual bits. Reading a uint32_t word in GDB and listing its bytes are different displays.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_01/; https://firner.com/presentations/cs211/2026-Fall/cs211_03/",
+    "table": null
+  },
+  {
+    "title": "Signed values use the same bit patterns",
+    "section": "Two’s complement",
+    "lead": "n bits provide 2^n distinct patterns. Signed and unsigned interpretation assign different meanings to those patterns.\n\nFor 8-bit two’s complement, the range is −128 through 127. Negation flips the bits and adds 1, keeping 8 bits.",
+    "example": "8-bit pattern: 11111111\nUnsigned meaning: 255\nSigned meaning:   −1\n\nNegate 10000000 in 8 bits:\nFlip: 01111111\nAdd 1: 10000000",
+    "caption": "Mathematically +128 cannot fit in a signed 8-bit result.",
+    "answer": "1. Signed and unsigned 8-bit values each have 256 possible patterns.\n\n2. The fixed-width negation pattern for 10000000 is still 10000000. Read as signed, it is −128, but the desired positive result overflowed the signed 8-bit range.",
+    "notes": "Emphasize interpretation rather than a separate collection of signed memory cells. For general n-bit signed values, minimum is −2^(n−1) and maximum is 2^(n−1)−1. This is a fixed-width hardware/representation exercise. In C, small integer types are usually promoted before arithmetic, and signed overflow at the operation’s actual type width is undefined behavior; do not claim ordinary signed C overflow is guaranteed to wrap.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_02/; https://firner.com/presentations/cs211/2026-Fall/cs211_04/",
+    "table": null
+  },
+  {
+    "title": "Masks, shifts, and rotations",
+    "section": "Bit-operation practice",
+    "lead": "AND keeps only bits selected by a mask. OR sets selected bits. XOR flips selected bits.\n\nA shift drops bits from one end. A rotation brings those bits around to the other end.\n\nUse an explicitly unsigned 8-bit model here.",
+    "example": "x = 0xB6 = 10110110₂\n\nx & 0x0F = ?\n(x << 1) & 0xFF = ?\nRotate left by 1 within 8 bits = ?",
+    "caption": "Keep the chosen width explicit; C integer promotions do not automatically limit x << 1 to 8 bits.",
+    "answer": "1. x & 0x0F = 0x06, keeping the low four bits.\n\n2. The masked left shift is 0x6C = 01101100₂.\n\n3. The rotation is 0x6D = 01101101₂: the old top bit becomes the low bit.",
+    "notes": "Draw eight seats in a row; a shift throws the person at the end away, while a rotation sends that person around to the empty seat. For the homework-style method, combine a masked left shift with x >> 7. State the width and use unsigned arithmetic; shift counts must be valid for the promoted operand type. This is a one-bit illustration, not a complete general rotation function with all edge cases.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_02/; https://firner.com/presentations/cs211/2026-Fall/hw2.html",
+    "table": null
+  },
+  {
+    "title": "Build a truth table one gate at a time",
+    "section": "Digital logic",
+    "lead": "Do not try to guess the entire circuit at once. Write a column for each intermediate result.\n\nFor one-bit inputs, AND needs both 1, OR needs at least one 1, and NOT reverses the bit.",
+    "example": "Output = (A AND B) OR (NOT A)\n\nFill each row from left to right.",
+    "caption": "The same method works when the circuit is drawn with gate symbols.",
+    "answer": "1. A=0,B=0: AND=0, NOT A=1, so output=1.\n\n2. A=0,B=1: AND=0, NOT A=1, so output=1.\n\n3. A=1,B=0: AND=0, NOT A=0, so output=0.\n\n4. A=1,B=1: AND=1, NOT A=0, so output=1.",
+    "notes": "Board: draw columns A, B, A AND B, NOT A, Out. For each row, fill both internal columns before Out. Circle the wire entering NOT so students do not invert the wrong input. In C, bitwise &, |, ~ operate on bit patterns, while logical &&, ||, ! operate on truth values; this slide is single-bit logic. A truth table with n binary inputs needs 2^n rows.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_02/; https://firner.com/presentations/cs211/2026-Fall/cs211_12/",
+    "table": {
+      "headers": ["A", "B", "A AND B", "NOT A", "Out"],
+      "rows": [
+        ["0", "0", "?", "?", "?"],
+        ["0", "1", "?", "?", "?"],
+        ["1", "0", "?", "?", "?"],
+        ["1", "1", "?", "?", "?"]
+      ]
+    }
+  },
+  {
+    "title": "Adders and propagation delay",
+    "section": "Combinational hardware",
+    "lead": "A full adder takes A, B, and carry-in. It produces a sum bit and carry-out.\n\nSignals need time to propagate through gates. A ripple adder can wait for a carry to pass through many bit positions.\n\nCarry-lookahead uses more logic to reduce that dependency.",
+    "example": "Sum = A XOR B XOR Cin\nCout = (A AND B) OR\n       (Cin AND (A XOR B))\n\nA=1, B=1, Cin=0:\nSum = ?\nCout = ?",
+    "caption": "Timing follows the longest relevant signal path, not just the number of gates drawn.",
+    "answer": "1. Sum = 1 XOR 1 XOR 0 = 0.\n\n2. Carry-out = 1. The binary total is 10₂.\n\n3. Lookahead trades extra circuitry for less serial carry waiting; it does not make propagation delay disappear.",
+    "notes": "Use decimal addition’s carry as the analogy. Two ones in a binary column produce zero in that column and carry one left. If each stage waits for the previous carry, a longer chain can take longer. For lookahead, define G=A AND B and P=A XOR B; then Cnext=G OR (P AND Cin). Avoid quoting a universal fixed number of gate delays because it depends on the implementation. Distinguish combinational propagation delay from sequential state storage.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_03/; https://firner.com/presentations/cs211/2026-Fall/cs211_12/; https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "table": null
+  },
+  {
+    "title": "MUXes select; decoders identify",
+    "section": "Control logic",
+    "lead": "A multiplexer routes one selected input to its output.\n\nA decoder translates a binary input into a selected output line.\n\nThey help choose operands, operations, and memory locations.",
+    "example": "2-to-1 MUX:\nS=0 selects A; S=1 selects B\nA=0, B=1, S=1: output = ?\n\n2-to-4 active-high decoder:\ninput 10₂: selected line = ?\n\n8-input MUX: selector bits = ?",
+    "caption": "For 2^n MUX inputs, n selector bits are needed.",
+    "answer": "1. The MUX output is B = 1.\n\n2. Input 10₂ selects line 2; the other output lines are 0 in this active-high model.\n\n3. An 8-input MUX needs 3 selector bits because 2³ = 8.",
+    "notes": "Say: a MUX is a switch choosing which wire gets through; a decoder is a row of labels where one label lights up. Use active-high and enabled as explicit assumptions, since real parts can have active-low outputs and enable controls. n inputs to a binary decoder means n input BITS and up to 2^n output lines, not 2^n-bit values at every output.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_12/",
+    "table": null
+  },
+  {
+    "title": "Combinational logic versus stored state",
+    "section": "Sequential logic",
+    "lead": "Combinational output depends on current inputs. Sequential behavior also depends on saved state.\n\nA D latch follows D while enabled, then holds its value. A D flip-flop samples D at its active clock edge.",
+    "example": "Rising-edge D flip-flop:\n\nQ starts at 0.\nD changes to 1 between clock edges.\nBefore the next rising edge: Q = ?\nAt that rising edge: Q becomes ?",
+    "caption": "A latch is level-sensitive; a flip-flop is edge-triggered.",
+    "answer": "1. Before the next active rising edge, Q stays 0.\n\n2. At the rising edge, Q becomes 1, assuming D has been stable long enough to meet timing requirements.",
+    "notes": "Analogy: a latch is an open window while enabled; a flip-flop is a snapshot at one instant. For an active-high NOR SR latch, S=R=0 holds, S=1 sets, R=1 resets, and S=R=1 is invalid. Do not transfer those levels directly to a NAND latch, whose controls are active-low. Combinational gate delays still exist in sequential circuits. The clock period must leave enough time for data to travel and settle before capture.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "table": null
+  },
+  {
+    "title": "Short C code: trace the actual values",
+    "section": "Coding practice",
+    "lead": "The midterm can include short code based on the homework. Trace one iteration at a time.\n\nWhat does this function return for {3, 4, 7, 8}?\n\nWhat test selects the numbers being added?",
+    "example": "unsigned sum_even(const unsigned *v,\n                  unsigned n) {\n    unsigned total = 0;\n    for (unsigned i = 0; i < n; ++i) {\n        if ((v[i] & 1u) == 0)\n            total += v[i];\n    }\n    return total;\n}",
+    "caption": "Assume v points to at least n valid elements. No new allocation is needed.",
+    "answer": "1. The return value is 12: 4 + 8.\n\n2. v[i] & 1u reads the low bit. A zero low bit means an even unsigned integer.\n\n3. total across the four iterations is 0, 4, 4, 12.",
+    "notes": "Board: write i, v[i], low bit, total. Students should trace rather than guess from the function name. Point out n is an element count, not a byte count; do not use sizeof v to recover it. const prevents writing elements through v. Ask what happens for n=0: the loop runs zero times and returns 0. Check pointer validity and bounds assumptions before reasoning about values.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_04/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_13/ (midterm coding scope)",
+    "table": null
+  },
+  {
+    "title": "Pipelines overlap instructions",
+    "section": "Brief pipeline recap",
+    "lead": "Split instruction work into stages so different instructions can occupy different stages at the same time.\n\nPipelining improves throughput. It does not mean one instruction finishes instantly.",
+    "example": "IF: fetch the instruction\nID: decode and read registers\nEX: compute or calculate an address\nMA: access memory\nWB: write the result\n\nIdeal 5-stage pipeline, 4 instructions:\ncycles = 5 + 4 − 1 = ?",
+    "caption": "Assume one cycle per stage, no hazards, and a single issue per cycle.",
+    "answer": "1. It takes 8 cycles to finish four instructions from an empty ideal pipeline.\n\n2. Each instruction still spans five stages. After the pipeline fills, up to one instruction finishes per cycle under these assumptions.",
+    "notes": "Analogy: a laundry line can wash one load while drying another; each load still goes through all the steps. State the ideal assumptions before using k+n−1. Real stages can have unequal delays; clock time is constrained by the slowest stage plus register overhead. More stages do not guarantee a proportional speedup. The professor lists this material as included but less emphasized than Lectures 1–13.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
+    "table": null
+  },
+  {
+    "title": "Dependencies can force a wait",
+    "section": "Brief pipeline recap",
+    "lead": "A data hazard occurs when an instruction needs a result that is not ready. Forwarding can deliver a result before normal writeback; some cases still need a stall.\n\nA control hazard comes from uncertainty about the next instruction address.",
+    "example": "# Data dependency on rax\nmovq (%rdi), %rax\naddq %rax, %rbx\n\n# Control depends on comparison\ncmpq $0, %rax\nje zero_case",
+    "caption": "Forwarding cannot provide a value before the earlier instruction has produced it.",
+    "answer": "1. addq needs the value loaded into RAX. In the course’s five-stage model, an immediate load/use dependency typically needs a stall even with forwarding.\n\n2. je depends on the comparison result and changes the next instruction address. A wrong prediction can require discarding speculative work.",
+    "notes": "Ask students to draw a circle around the value being produced and consumed: RAX. For the branch, circle the flags produced by cmp and consumed by je. Forwarding is a shortcut wire, not time travel. In a simple in-order pipeline, RAW is the main data dependency; WAR/WAW become more important with reordering and multiple execution paths. Independent instructions can sometimes be scheduled while waiting, subject to preserving program behavior.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
+    "table": null
+  },
+  {
+    "title": "Final check: explain the difference",
+    "section": "Practice recap",
+    "lead": "Give one clear sentence for each pair.\n\nAn answer should name what changes and what stays the same.\n\nThen return to the topic you could not explain yet.",
+    "example": "1. Pointer size vs allocation size\n2. Address vs contents\n3. Stored fraction vs significand\n4. Struct vs union\n5. Stack cleanup vs free\n6. Latency vs throughput",
+    "caption": "Use the same reasoning on new numbers and new code.",
+    "answer": "1. Pointer size measures the address object; allocation size measures the separate requested block.\n\n2. An address identifies a location; contents are the bytes stored there.\n\n3. The normal significand restores the implied leading 1 before the stored fraction.\n\n4. Struct members use distinct storage; union members overlap.\n\n5. Stack cleanup ends the current frame’s automatic lifetimes; free releases a dynamic allocation.\n\n6. Latency is the time for one task; throughput is the rate of completing tasks.",
+    "notes": "Use this as a verbal exit check, not a race. Students should be able to explain the pointer and fraction distinctions without plugging values into a formula. If time is short, prioritize the union walkthrough and have students complete the extra float and pointer problems independently. Refer them to the lecture examples and past quizzes for full course coverage; no single recitation can reproduce every example.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
+    "table": null
+  }
+]

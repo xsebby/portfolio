@@ -150,6 +150,30 @@ export default function Presentations() {
             </div>
           </div>
         </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>07</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 07</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-07">
+                Midterm review
+              </Link>
+            </h3>
+            <p>
+              Worked float and union examples, pointers, stack and heap,
+              assembly, integer representations, digital logic, and a brief
+              pipeline review.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-07">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="/presentations/CS211_Recitation_7.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
       </section>
       <footer className={styles.hubFooter}>
         Course deadlines and submission details live on Canvas.
