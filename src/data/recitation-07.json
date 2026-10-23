@@ -6,7 +6,7 @@
     "example": "Pointers and memory\nFloat bits, structs, and unions\nAssembly and digital logic",
     "caption": "",
     "answer": "",
-    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–18. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–17. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
     "table": null
   },
   {
@@ -186,16 +186,6 @@
     "caption": "The leading normalized 1 is implied; only the bits after the point are stored.",
     "answer": "1. 0.11₂ = 1.1₂ × 2^(−1).\n\n2. The sign bit is 1.\n\n3. Stored exponent = −1 + 15 = 14, or 01110₂.\n\n4. Fraction bits are 10, so the stored fraction integer F = 2. The full encoding is 1 | 01110 | 10.",
     "notes": "Say: move the binary point one place right to create 1.1, so compensate with an exponent of −1. Then add the bias; do not subtract it during encoding. Two fraction bits give room for .10. Explain why this value is exact: the fraction is a finite binary fraction and fits the field. Compare with the old quiz format, but use the new value so students must transfer the method.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
-    "table": null
-  },
-  {
-    "title": "Rounding means choosing an available value",
-    "section": "Range and precision",
-    "lead": "A limited fraction field leaves gaps between representable values.\n\nWith two fraction bits near magnitude 1, the normal significands are 1.00, 1.01, 1.10, and 1.11.\n\nWhich is closest to −1.3?",
-    "example": "Available magnitudes near 1:\n1.00₂ = 1.00\n1.01₂ = 1.25\n1.10₂ = 1.50\n1.11₂ = 1.75\n\nDistance to −1.25: ?\nDistance to −1.50: ?",
-    "caption": "More exponent bits help range; more fraction bits help precision. Gaps grow with scale.",
-    "answer": "1. The distance to −1.25 is 0.05.\n\n2. The distance to −1.50 is 0.20.\n\n3. The closest representable value is −1.25, under the stated format and round-to-nearest rule.",
-    "notes": "Draw four marks on a number line, then place −1.3 between −1.5 and −1.25. Closest does not mean always round toward zero; compare distances. At the next power-of-two range the spacing doubles. The examples avoid a midpoint tie; a tie rule such as ties-to-even matters when distances are equal. FP arithmetic can round, but not every float operation is slower than its integer counterpart: different hardware and operations have different costs.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
     "table": null
   },
   {
