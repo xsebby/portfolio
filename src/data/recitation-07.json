@@ -189,16 +189,6 @@
     "table": null
   },
   {
-    "title": "A 64-bit CPU can have wider registers",
-    "section": "Floating-point registers",
-    "lead": "The machine’s common integer-register width does not set the maximum size of every register.\n\nAn XMM register can hold a scalar 32-bit float even though the register itself is 128 bits wide.\n\nWider extensions depend on the supported instruction set.",
-    "example": "x87: 80-bit floating-point registers\nXMM: 128 bits = 16 bytes\nYMM: 256 bits = 32 bytes\nZMM: 512 bits = 64 bytes (AVX-512)\n\nmovss / addss: low scalar FP32\nmovsd / addsd: low scalar FP64",
-    "caption": "There is no universal “largest register = 64 bits” rule for a 64-bit system.",
-    "answer": "1. A 32-bit float stored in XMM does not make XMM a 32-bit register. XMM is 128 bits wide.\n\n2. The largest available register depends on CPU extensions; common examples are wider than 64 bits.",
-    "notes": "Say: a large tray can hold one small cup; tray size and cup size are different. This is why both 64-bit and 8-byte choices on released Quiz 3A Q11 were insufficient. XMM is the low 128 bits of the corresponding YMM; ZMM, when present, extends that storage further. x87 has its own register stack, separate from the function-call stack. MMX registers are packed-integer aliases of x87 storage, not another name for XMM. Scalar mulss/addss use float values, not integer addition of their bit encodings.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_11/; https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html",
-    "table": null
-  },
-  {
     "title": "Hex, binary, and byte order",
     "section": "Representation recap",
     "lead": "One hex digit represents four bits. Convert one digit at a time.\n\nEndianness orders bytes in memory; it does not reverse the bits within each byte.\n\nStart at the lowest address when listing stored bytes.",
