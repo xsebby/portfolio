@@ -189,16 +189,6 @@
     "table": null
   },
   {
-    "title": "Special exponents change the rule",
-    "section": "Zero and subnormal values",
-    "lead": "Check the exponent before applying the normal formula.\n\nAn exponent of all zeros uses 0.f and a scale of 2^(1−bias).\n\nAn exponent of all ones means infinity or NaN.",
-    "example": "For the 1 / 5 / 2 format, bias 15:\n\nE = 0, F = 0: zero\nE = 0, F > 0: subnormal\nE = 1..30: normal\nE = 31, F = 0: infinity\nE = 31, F > 0: NaN\n\nDecode s=0, E=0, F=1.",
-    "caption": "A zero stored exponent does not force the whole number to be zero.",
-    "answer": "1. E=0 and F=1 is subnormal.\n\n2. Fraction = 1/2² = 1/4, with no implied leading 1.\n\n3. Value = 2^(1−15) × 1/4 = 2^(−16).",
-    "notes": "Ask students to compare E=0,F=0 and E=0,F=1. The second retains a tiny positive magnitude. For FP32, replace the bias by 127, fraction-bit count by 23, and all-ones E by 255. Be careful not to use 2^(0−bias) for subnormals. Zero’s sign bit permits +0 or −0.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/",
-    "table": null
-  },
-  {
     "title": "A 64-bit CPU can have wider registers",
     "section": "Floating-point registers",
     "lead": "The machine’s common integer-register width does not set the maximum size of every register.\n\nAn XMM register can hold a scalar 32-bit float even though the register itself is 128 bits wide.\n\nWider extensions depend on the supported instruction set.",
