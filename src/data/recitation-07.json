@@ -6,7 +6,7 @@
     "example": "Pointers and memory\nFloat bits, structs, and unions\nAssembly and digital logic",
     "caption": "",
     "answer": "",
-    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–20. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–18. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
     "table": null
   },
   {
@@ -137,28 +137,8 @@
     "lead": "First build the fields: exponent = 128, sign = 0, and stored fraction = 0. The omitted named fields are zero-initialized.\n\nNext read those bytes as a float and store that value in f.\n\nFinally, printf displays f. What will it print?",
     "example": "struct FloatBits {\n    unsigned int significand : 23;\n    unsigned int exponent : 8;\n    unsigned int sign : 1;\n};\nstruct FloatBits fb = {.exponent = 128};\nfloat f = *(float *)&fb;\nprintf(\"First value is %f\\n\", f);",
     "caption": "As in the quiz: assume the course’s FP32 bit-field layout. This pointer-cast technique is not portable C.",
-    "answer": "1. The initializer produces fields s = 0, E = 128, and F = 0.\n\n2. *(float *)&fb reads those bytes using their floating-point meaning; it does not convert the integer 128 to the float 128.0.\n\n3. The next two slides break down the read and the math. The line prints First value is 2.000000.",
+    "answer": "1. The initializer produces fields s = 0, E = 128, and F = 0.\n\n2. *(float *)&fb reads those bytes using their floating-point meaning; it does not convert the integer 128 to the float 128.0.\n\n3. The value is +1 × 2^(128 − 127) × (1 + 0/2^23) = 2.0. The line prints First value is 2.000000.",
     "notes": "This explains released Quiz 3A Q6 and restores the original read and print operations. Include stdio.h in a complete program. The cast itself does not change fb or decode its exponent. &fb takes the address; the outer * is the read; assignment copies the resulting float value into f. printf then displays f, with the usual float-to-double argument promotion. Say: We are following bytes, then interpreting them, then printing the interpreted value. The original pointer cast depends on bit-field layout and violates ordinary portable-C aliasing assumptions; teach the intended course interpretation under its stated implementation assumptions. For production C on a known FP32 system, explicit uint32_t bit construction and memcpy into a float avoid this pointer-aliasing issue.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; released Quiz 3A, Q6",
-    "table": null
-  },
-  {
-    "title": "Quiz 3: address, cast, then read",
-    "section": "Worked walkthrough · reinterpretation",
-    "lead": "&fb produces the address of the struct. It does not fetch a number yet.\n\n(float *)&fb treats that same address as a float pointer. The bytes do not change.\n\nThe outer * reads those bytes as a float. That value is copied into f, then printf displays it.",
-    "example": "float f = *(float *)&fb;\n\n1. &fb           // take the address\n2. (float *)&fb  // same address\n3. *(float *)&fb // read as a float\n\nSame bytes, grouped as FP32:\n0 | 10000000 | 000...000\ns       E          F",
-    "caption": "This is the quiz’s intended interpretation under its stated layout; it is not a numeric cast of 128.",
-    "answer": "",
-    "notes": "Board: draw one group of four byte boxes labeled fb. Put an address label beside it. Step 1 gives the address label. Step 2 changes the lens through which code reads the bytes, without editing the boxes. Step 3 reads a float value from those boxes. Draw a separate f box holding the copied value. Avoid saying fb and f must share storage: the read is through shared bytes, but the assignment creates a separate float object. A cast of a POINTER changes how access is described; a numeric cast such as (float)128 would instead convert the integer number to 128.0. Repeat the implementation/aliasing caveat once, then focus on the intended exercise.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; released Quiz 3A, Q6",
-    "table": null
-  },
-  {
-    "title": "Quiz 3: why the first value is 2.0",
-    "section": "Worked walkthrough · decode the fields",
-    "lead": "Sign 0 means positive. The stored exponent 128 means an actual exponent of 128 − 127 = 1.\n\nFor a normal float, the significand is 1 plus the stored fraction. All fraction bits are zero, so it is 1.000...₂ = 1.0.\n\nAn exponent of 1 means multiply by 2 once: 1.0 becomes 2.0.",
-    "example": "s = 0; E = 128; F = 0\n\nSign:        (-1)^0 = +1\nExponent:    128 − 127 = 1\nSignificand: 1 + 0/2^23 = 1.0\n\nValue = +1 × 2^1 × 1.0\n      = +1 × 2 × 1\n      = 2.0\nprintf shows: First value is 2.000000",
-    "caption": "Zero stored fraction does not mean zero value: a normal float has an implied leading 1.",
-    "answer": "",
-    "notes": "Say: The fraction bits are all zero, so there is no extra half, quarter, or eighth. But a normal float starts with one whole. Now the exponent tells us to double that one whole once. That is where two comes from. Write the general normal formula (-1)^s × 2^(E−127) × (1 + F/2^23) and substitute ONE FIELD AT A TIME. Do not jump directly from exponent 128 to final value 2. Ask: If E were 127 instead, what would happen? Scale 2^0=1, so the value would be 1.0. If E were 129 with the same other fields, the value would be 4.0. These checks show that the exponent chooses a scale, not the final numeric value directly.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; released Quiz 3A, Q6",
     "table": null
   },
   {
