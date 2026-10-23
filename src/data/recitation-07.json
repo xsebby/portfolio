@@ -199,16 +199,6 @@
     "table": null
   },
   {
-    "title": "Stack exhaustion and stack corruption",
-    "section": "Stack safety",
-    "lead": "Exhaustion: too many active frames or large local allocations use up the available stack.\n\nCorruption: code writes outside a valid object and may overwrite nearby state.\n\nA canary is a marker checked for unexpected change.",
-    "example": "char word[4];\n// Valid indexes: 0,1,2,3\nword[4] = 0;  // invalid write\n\nCanary: detects some overwrites\nASLR: makes addresses less predictable\nNX: blocks execution from data pages",
-    "caption": "Why is word[4] invalid? What does an unexpectedly changed guard suggest?",
-    "answer": "1. word[4] is outside the 4-byte array and is undefined behavior. It is a bounds error, not proof the entire stack has run out.\n\n2. An unexpectedly changed guard suggests corruption, not normal stack cleanup. The exact effect and whether a crash occurs are not guaranteed.",
-    "notes": "Use a desk analogy: running out of desk space differs from scribbling over someone else’s paper. The old quiz guard is conceptual canary behavior. A callee may write through a valid pointer into caller-owned data, so not every cross-frame write is inherently illegal; the unexpected unauthorized overwrite is the problem. Canaries detect some corruption, ASLR changes predictability, and NX changes execution permissions. Do not imply the byte pattern identifies the exact buggy instruction.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_11/",
-    "table": null
-  },
-  {
     "title": "Hex, binary, and byte order",
     "section": "Representation recap",
     "lead": "One hex digit represents four bits. Convert one digit at a time.\n\nEndianness orders bytes in memory; it does not reverse the bits within each byte.\n\nStart at the lowest address when listing stored bytes.",
