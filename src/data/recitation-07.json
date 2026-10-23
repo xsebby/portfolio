@@ -6,7 +6,7 @@
     "example": "Pointers and memory\nFloat bits, structs, and unions\nAssembly and digital logic",
     "caption": "",
     "answer": "",
-    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–17. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. The final three content slides provide the lighter pipeline recap. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
+    "notes": "Start by saying: We will separate the address, the stored bits, and the meaning of those bits. Most of the hard questions mix two of these ideas. Spend the most time on slides 9–17. The posted midterm scope emphasizes lectures 1–13 and includes 14–15 with less emphasis. This is a review guide, not a promise of the exact exam questions.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
     "table": null
   },
   {
@@ -254,66 +254,6 @@
     "caption": "Timing follows the longest relevant signal path, not just the number of gates drawn.",
     "answer": "1. Sum = 1 XOR 1 XOR 0 = 0.\n\n2. Carry-out = 1. The binary total is 10₂.\n\n3. Lookahead trades extra circuitry for less serial carry waiting; it does not make propagation delay disappear.",
     "notes": "Use decimal addition’s carry as the analogy. Two ones in a binary column produce zero in that column and carry one left. If each stage waits for the previous carry, a longer chain can take longer. For lookahead, define G=A AND B and P=A XOR B; then Cnext=G OR (P AND Cin). Avoid quoting a universal fixed number of gate delays because it depends on the implementation. Distinguish combinational propagation delay from sequential state storage.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_03/; https://firner.com/presentations/cs211/2026-Fall/cs211_12/; https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
-    "table": null
-  },
-  {
-    "title": "MUXes select; decoders identify",
-    "section": "Control logic",
-    "lead": "A multiplexer routes one selected input to its output.\n\nA decoder translates a binary input into a selected output line.\n\nThey help choose operands, operations, and memory locations.",
-    "example": "2-to-1 MUX:\nS=0 selects A; S=1 selects B\nA=0, B=1, S=1: output = ?\n\n2-to-4 active-high decoder:\ninput 10₂: selected line = ?\n\n8-input MUX: selector bits = ?",
-    "caption": "For 2^n MUX inputs, n selector bits are needed.",
-    "answer": "1. The MUX output is B = 1.\n\n2. Input 10₂ selects line 2; the other output lines are 0 in this active-high model.\n\n3. An 8-input MUX needs 3 selector bits because 2³ = 8.",
-    "notes": "Say: a MUX is a switch choosing which wire gets through; a decoder is a row of labels where one label lights up. Use active-high and enabled as explicit assumptions, since real parts can have active-low outputs and enable controls. n inputs to a binary decoder means n input BITS and up to 2^n output lines, not 2^n-bit values at every output.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_12/",
-    "table": null
-  },
-  {
-    "title": "Combinational logic versus stored state",
-    "section": "Sequential logic",
-    "lead": "Combinational output depends on current inputs. Sequential behavior also depends on saved state.\n\nA D latch follows D while enabled, then holds its value. A D flip-flop samples D at its active clock edge.",
-    "example": "Rising-edge D flip-flop:\n\nQ starts at 0.\nD changes to 1 between clock edges.\nBefore the next rising edge: Q = ?\nAt that rising edge: Q becomes ?",
-    "caption": "A latch is level-sensitive; a flip-flop is edge-triggered.",
-    "answer": "1. Before the next active rising edge, Q stays 0.\n\n2. At the rising edge, Q becomes 1, assuming D has been stable long enough to meet timing requirements.",
-    "notes": "Analogy: a latch is an open window while enabled; a flip-flop is a snapshot at one instant. For an active-high NOR SR latch, S=R=0 holds, S=1 sets, R=1 resets, and S=R=1 is invalid. Do not transfer those levels directly to a NAND latch, whose controls are active-low. Combinational gate delays still exist in sequential circuits. The clock period must leave enough time for data to travel and settle before capture.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_13/",
-    "table": null
-  },
-  {
-    "title": "Short C code: trace the actual values",
-    "section": "Coding practice",
-    "lead": "The midterm can include short code based on the homework. Trace one iteration at a time.\n\nWhat does this function return for {3, 4, 7, 8}?\n\nWhat test selects the numbers being added?",
-    "example": "unsigned sum_even(const unsigned *v,\n                  unsigned n) {\n    unsigned total = 0;\n    for (unsigned i = 0; i < n; ++i) {\n        if ((v[i] & 1u) == 0)\n            total += v[i];\n    }\n    return total;\n}",
-    "caption": "Assume v points to at least n valid elements. No new allocation is needed.",
-    "answer": "1. The return value is 12: 4 + 8.\n\n2. v[i] & 1u reads the low bit. A zero low bit means an even unsigned integer.\n\n3. total across the four iterations is 0, 4, 4, 12.",
-    "notes": "Board: write i, v[i], low bit, total. Students should trace rather than guess from the function name. Point out n is an element count, not a byte count; do not use sizeof v to recover it. const prevents writing elements through v. Ask what happens for n=0: the loop runs zero times and returns 0. Check pointer validity and bounds assumptions before reasoning about values.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_04/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_13/ (midterm coding scope)",
-    "table": null
-  },
-  {
-    "title": "Pipelines overlap instructions",
-    "section": "Brief pipeline recap",
-    "lead": "Split instruction work into stages so different instructions can occupy different stages at the same time.\n\nPipelining improves throughput. It does not mean one instruction finishes instantly.",
-    "example": "IF: fetch the instruction\nID: decode and read registers\nEX: compute or calculate an address\nMA: access memory\nWB: write the result\n\nIdeal 5-stage pipeline, 4 instructions:\ncycles = 5 + 4 − 1 = ?",
-    "caption": "Assume one cycle per stage, no hazards, and a single issue per cycle.",
-    "answer": "1. It takes 8 cycles to finish four instructions from an empty ideal pipeline.\n\n2. Each instruction still spans five stages. After the pipeline fills, up to one instruction finishes per cycle under these assumptions.",
-    "notes": "Analogy: a laundry line can wash one load while drying another; each load still goes through all the steps. State the ideal assumptions before using k+n−1. Real stages can have unequal delays; clock time is constrained by the slowest stage plus register overhead. More stages do not guarantee a proportional speedup. The professor lists this material as included but less emphasized than Lectures 1–13.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
-    "table": null
-  },
-  {
-    "title": "Dependencies can force a wait",
-    "section": "Brief pipeline recap",
-    "lead": "A data hazard occurs when an instruction needs a result that is not ready. Forwarding can deliver a result before normal writeback; some cases still need a stall.\n\nA control hazard comes from uncertainty about the next instruction address.",
-    "example": "# Data dependency on rax\nmovq (%rdi), %rax\naddq %rax, %rbx\n\n# Control depends on comparison\ncmpq $0, %rax\nje zero_case",
-    "caption": "Forwarding cannot provide a value before the earlier instruction has produced it.",
-    "answer": "1. addq needs the value loaded into RAX. In the course’s five-stage model, an immediate load/use dependency typically needs a stall even with forwarding.\n\n2. je depends on the comparison result and changes the next instruction address. A wrong prediction can require discarding speculative work.",
-    "notes": "Ask students to draw a circle around the value being produced and consumed: RAX. For the branch, circle the flags produced by cmp and consumed by je. Forwarding is a shortcut wire, not time travel. In a simple in-order pipeline, RAW is the main data dependency; WAR/WAW become more important with reordering and multiple execution paths. Independent instructions can sometimes be scheduled while waiting, subject to preserving program behavior.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
-    "table": null
-  },
-  {
-    "title": "Final check: explain the difference",
-    "section": "Practice recap",
-    "lead": "Give one clear sentence for each pair.\n\nAn answer should name what changes and what stays the same.\n\nThen return to the topic you could not explain yet.",
-    "example": "1. Pointer size vs allocation size\n2. Address vs contents\n3. Stored fraction vs significand\n4. Struct vs union\n5. Stack cleanup vs free\n6. Latency vs throughput",
-    "caption": "Use the same reasoning on new numbers and new code.",
-    "answer": "1. Pointer size measures the address object; allocation size measures the separate requested block.\n\n2. An address identifies a location; contents are the bytes stored there.\n\n3. The normal significand restores the implied leading 1 before the stored fraction.\n\n4. Struct members use distinct storage; union members overlap.\n\n5. Stack cleanup ends the current frame’s automatic lifetimes; free releases a dynamic allocation.\n\n6. Latency is the time for one task; throughput is the rate of completing tasks.",
-    "notes": "Use this as a verbal exit check, not a race. Students should be able to explain the pointer and fraction distinctions without plugging values into a formula. If time is short, prioritize the union walkthrough and have students complete the extra float and pointer problems independently. Refer them to the lecture examples and past quizzes for full course coverage; no single recitation can reproduce every example.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_05/; https://firner.com/presentations/cs211/2026-Fall/cs211_09/; https://firner.com/presentations/cs211/2026-Fall/cs211_10/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
     "table": null
   }
 ]
