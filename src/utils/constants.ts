@@ -109,6 +109,14 @@ export const WORK_ITEMS: readonly WorkItem[] = [
 
 export const PROJECTS: readonly Project[] = [
   {
+    name: "baes",
+    slug: "baes",
+    role: "creator",
+    date: "october 2026 - present",
+    about: "a self-hosted music streaming app for unreleased tracks and local files, with spotify library mirroring.",
+    url: "https://music.sebby.dev/",
+  },
+  {
     name: "CSP revamped - HACKRU 2025",
     slug: "csp-revamped-hackru-2025",
     role: "developer",
@@ -125,8 +133,7 @@ export const PROJECTS: readonly Project[] = [
     role: "creator",
     date: "april 2026 - present",
     about: "a personal finance and budgeting app (WIP)",
-    url: "https://github.com/xsebby/stock-portfolio-tracker",
-    clickable: false,
+    url: "https://pulse-beta-gold.vercel.app/",
     details:
       "tracking spending categories, setting monthly budgets, and surfacing trends over time. still actively building core features.",
   },
