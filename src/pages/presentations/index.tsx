@@ -174,6 +174,29 @@ export default function Presentations() {
             </div>
           </div>
         </article>
+        <article className={styles.recitation}>
+          <span className={styles.recitationNumber}>08</span>
+          <div>
+            <p className={styles.eyebrow}>Recitation 08</p>
+            <h3>
+              <Link href="/presentations/cs211-recitation-08">
+                Quiz 4 review
+              </Link>
+            </h3>
+            <p>
+              Pipeline timing and hazards, branch prediction, parallel
+              execution, and the memory hierarchy.
+            </p>
+            <div className={styles.resourceLinks}>
+              <Link href="/presentations/cs211-recitation-08">
+                Open slides <span aria-hidden="true">↗</span>
+              </Link>
+              <a href="/presentations/CS211_Recitation_8.pptx" download>
+                Download PowerPoint
+              </a>
+            </div>
+          </div>
+        </article>
       </section>
       <footer className={styles.hubFooter}>
         Course deadlines and submission details live on Canvas.

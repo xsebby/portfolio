@@ -1,0 +1,122 @@
+[
+  {
+    "title": "Quiz 4 review",
+    "section": "CS 211 · Recitation 08",
+    "lead": "Computer Architecture\nRutgers University",
+    "example": "Pipeline timing and hazards\nInstruction-level parallelism\nMemory and storage",
+    "caption": "",
+    "answer": "",
+    "notes": "Use the clock and forwarding examples on the board. Ask students to say when a value is ready and when it is needed.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_20/",
+    "table": null
+  },
+  {
+    "title": "The five-stage pipeline",
+    "section": "Pipeline model",
+    "lead": "Each stage can work on a different instruction during the same cycle. Pipeline registers hold one stage’s output for the next cycle.\n\nOnce the pipeline fills, the ideal single-issue model finishes one instruction per cycle.",
+    "example": "IF   Fetch instruction\nID   Decode and read registers\nEX   Compute result or address\nMA   Access data memory\nWB   Write register result\n\nCycle:   1   2   3   4   5   6\nInstr A  IF  ID  EX  MA  WB\nInstr B      IF  ID  EX  MA  WB",
+    "caption": "Latency is time for one instruction. Throughput is how many finish per unit of time.",
+    "answer": "",
+    "notes": "Point to cycle 3: A is executing while B is decoding. Those actions overlap. A still takes five cycles. An instruction can pass through a stage without doing useful work there.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/",
+    "table": null
+  },
+  {
+    "title": "The slowest stage sets the clock",
+    "section": "Pipeline timing",
+    "lead": "All stages share one clock period. Each stage has to finish its logic and meet the pipeline register timing.\n\nMinimum period = slowest stage + register overhead.",
+    "example": "A three-stage design:\nStage A: 35 ps\nStage B: 80 ps\nStage C: 45 ps\nRegister overhead: 6 ps\n\n1. What is the minimum period?\n2. How long does one instruction take?",
+    "caption": "Assume each instruction takes three cycles, with no stalls.",
+    "answer": "1. Minimum period: 80 + 6 = 86 ps.\n\n2. One instruction takes 3 × 86 = 258 ps in this model.",
+    "notes": "Ask why adding 35 + 80 + 45 does not give the clock period. Then split the slowest stage into two 40 ps stages: the 45 ps stage now limits the clock to 51 ps. Register overhead stays on every cycle, and extra stages can increase the number of cycles lost on a wrong prediction.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_17/",
+    "table": null
+  },
+  {
+    "title": "Which instruction needs a new value?",
+    "section": "Register dependencies",
+    "lead": "A read-after-write dependency (RAW) exists when a later instruction reads a value an earlier instruction writes.\n\nIn AT&T syntax the destination comes last. Parentheses mean a memory operand; the address register is read.",
+    "example": "A\nsubq $8, %r10\nxorq %r10, %r11\n\nB\nmovq %r8, 16(%r13)\nincq %r13\n\nWhich pair reads a newly written register?",
+    "caption": "Mark the first instruction’s writes and the second instruction’s reads.",
+    "answer": "A: Yes. The subtraction writes %r10 and the XOR reads that new %r10.\n\nB: No RAW register dependency. The store reads %r13 and writes memory; incq reads and then writes %r13.",
+    "notes": "B has a read before a later write (WAR, a name dependency). It does not need RAW forwarding in the in-order model. Do not say there is no dependency of any kind. The store uses the old address. XOR also reads its destination register before writing it.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_14/; https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "Forwarding an ALU result",
+    "section": "Data hazards",
+    "lead": "Forwarding sends a result directly to a later instruction that needs it. The consumer can use it before the register file gets updated.\n\nAn ALU result is ready at the end of EX.",
+    "example": "subq $8, %r10\nxorq %r10, %r11\n\nCycle:    1   2   3   4   5   6\nsubq      IF  ID  EX  MA  WB\nxorq          IF  ID  EX  MA  WB\n\nWhere does the new %r10 come from?\nWhich stage needs it?",
+    "caption": "Track the producer and consumer in different cycles.",
+    "answer": "1. The producer computes the result in EX during cycle 3.\n\n2. The consumer uses it in EX during cycle 4. Forward EX → EX; no stall here.",
+    "notes": "On the board, draw an arrow from the end of cycle 3 to the consumer’s EX in cycle 4. The same stage name does not mean the same cycle.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "When forwarding needs a stall",
+    "section": "Data hazards",
+    "lead": "A load calculates its address in EX, then gets the data at the end of MA.\n\nAn immediately following ALU instruction would need that data in EX during the same cycle. In this model, it must wait one cycle.",
+    "example": "movq 24(%r14), %r8\nandq %r8, %r9\n\nCycle:    1   2   3   4   5   6   7\nload      IF  ID  EX  MA  WB\nandq          IF  ID  --  EX  MA  WB\n\nWhat is forwarded, and when?",
+    "caption": "Assume a cache hit and the standard five-stage forwarding paths.",
+    "answer": "Forward the loaded %r8 from MA at the end of cycle 4 to EX in cycle 5. The one-cycle stall gives the load time to finish.",
+    "notes": "Draw the bubble in EX in cycle 4. The consumer waits in ID during that cycle. Contrast the loaded value with the address calculated one stage earlier. A longer memory delay can cause additional waiting.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "Branches and speculative work",
+    "section": "Control hazards",
+    "lead": "A conditional branch can leave the next instruction address uncertain. One option is to wait. Another is to predict a path and start work on it.\n\nIf the prediction is wrong, discard the younger work from that path and fetch from the correct address.",
+    "example": "if (count != 0)\n    total += count;\nelse\n    total -= 1;\n\nCPU predicts: take the first path.\nActual: count is zero.\n\nWhich work can become visible?",
+    "caption": "Prediction chooses a path; speculative execution does work before the choice is confirmed.",
+    "answer": "The update total += count was on the wrong path and cannot update architectural state. Execution resumes on the else path, which subtracts 1.",
+    "notes": "Distinguish the branch decision from speculation. A stall preserves correctness by waiting, while good prediction avoids much of that waiting. A TLB helps address translation; it does not choose which path to fetch.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_17/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "Width and out-of-order execution",
+    "section": "Instruction-level parallelism",
+    "lead": "A superscalar core can issue multiple instructions in a cycle if enough work is ready. That is pipeline width. Depth counts stages.\n\nAn out-of-order core can execute a ready instruction while an older one waits. It normally retires instructions in program order.",
+    "example": "A: Load a value from memory.\nB: Add using the value from A.\nC: Compute an unrelated counter.\n\nA is waiting on memory.\nWhich instruction can run early?",
+    "caption": "Front end: predict, fetch, and decode. Execution hardware schedules ready operations.",
+    "answer": "C can run while A waits, if execution resources are available. B needs the loaded value before it can run.",
+    "notes": "Prefetch can bring instructions closer before they are needed. Prediction supplies a likely fetch address. Width is within one core; threads supply additional work and cores are separate execution engines. In lecture diagrams the execution engine may be shown separately from memory and write-back.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_17/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "Work the CPU can overlap",
+    "section": "Architecture-aware code",
+    "lead": "Two operations can run in parallel when neither needs the other’s result. A running total creates a chain because each addition needs the previous total.\n\nSeparate accumulators can shorten that chain when it is safe to combine the results later.",
+    "example": "One chain:\ntotal += a[i];\ntotal += b[i];\n\nTwo independent chains:\nleft  += a[i];\nright += b[i];\n\nAfter the loop: total = left + right;",
+    "caption": "Assume zero initial totals, separate storage, and exact arithmetic.",
+    "answer": "",
+    "notes": "Distinguish instruction-level parallelism within a thread from running multiple threads. Reordering floating-point arithmetic can change rounding; this example assumes exact arithmetic. Resources and memory can still limit speed.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_17/; https://firner.com/presentations/cs211/2026-Fall/cs211_18/",
+    "table": null
+  },
+  {
+    "title": "Memory hierarchy",
+    "section": "Latency and capacity",
+    "lead": "Latency is the wait for one access. Capacity is how much data fits. Typical systems keep a little fast storage near the CPU and use larger, slower levels farther away.\n\nCaches hold copies of recently used or nearby blocks.",
+    "example": "Typical levels, near to far:\n\nRegisters\nL1 cache → L2 cache → last-level cache\nMain memory (DRAM)\nPersistent storage (SSD or hard drive)",
+    "caption": "An L1 miss can still hit in L2; it does not automatically mean a DRAM access.",
+    "answer": "",
+    "notes": "Contrast latency with bandwidth, the amount transferred per unit time. Capacities and exact access times vary by machine. Registers hold active operands, not cache blocks.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_19/",
+    "table": null
+  },
+  {
+    "title": "SRAM, DRAM, and storage",
+    "section": "Memory technology",
+    "lead": "SRAM holds bits with a stable transistor circuit while powered. DRAM holds charge in a capacitor and needs refresh. Both lose data without power.\n\nSSD and hard drive storage retain data without power.",
+    "example": "SRAM: fast, less dense → CPU caches\nDRAM: denser → main memory\n\nSSD: flash, no mechanical seek\nHDD: spinning platters and moving head",
+    "caption": "SRAM uses a bistable cell; a typical SRAM cell is not a clocked D flip-flop.",
+    "answer": "",
+    "notes": "Expand static and dynamic random-access memory. A cross-coupled latch-like circuit is the useful contrast with a leaky capacitor. Explain why random HDD access waits for head motion and platter rotation. Avoid claiming a universal transfer speed for all devices.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_19/",
+    "table": null
+  },
+  {
+    "title": "Access time versus transfer rate",
+    "section": "Practice recap",
+    "lead": "A device can take longer to start delivering data but still transfer a long sequence quickly once it gets going.\n\nThink about the number of requests and whether the data is contiguous.",
+    "example": "A program reads from a hard drive.\n\n1. It needs many tiny records\n   scattered around the drive.\n2. It reads one long contiguous file.\n\nWhat dominates each workload?",
+    "caption": "Use the same distinction when comparing startup delay and steady-state throughput.",
+    "answer": "1. Scattered reads pay repeated seek and rotational delays. Access latency matters most.\n\n2. A long contiguous read amortizes startup delay. Transfer rate matters more.",
+    "notes": "Ask for an explanation in words before showing the answers. A solid-state drive avoids mechanical seeks but still has access latency. Revisit the pipeline analogy: first-result delay and rate of completion measure different things.\n\nSources: https://firner.com/presentations/cs211/2026-Fall/cs211_15/; https://firner.com/presentations/cs211/2026-Fall/cs211_19/",
+    "table": null
+  }
+]
